@@ -24,9 +24,9 @@ This project enables a robotic arm to utilize computer vision for object detecti
 
 ### Step 1: Set Up Arctos Robotic Arm in ROS
 
-Follow the instructions provided in the [Arctos Robotic Arm ROS Setup Guide](<LINK_TO_ARCTOS_GUIDE>) to set up your robotic arm in ROS.
+Follow the instructions provided in the [Arctos Robotic Arm ROS Setup Guide](https://github.com/ArctosRobotics/ROS) to set up your robotic arm in ROS.
 
-### Step 2: Install Darknet and YOLO v3
+### Step 2: [Install Darknet and YOLO v3](https://github.com/leggedrobotics/darknet_ros)
 
 Clone the `darknet_ros` repository:
 
@@ -43,7 +43,7 @@ This repository will only contain the `object_follower.py` script. Follow these 
 1. **Clone this repository** (replace `<YOUR_REPOSITORY_URL>` with your actual repository URL):
 
    ```bash
-   git clone <YOUR_REPOSITORY_URL>
+   git clone https://github.com/ArctosRobotics/Computer-vision
    ```
 
 2. **Copy the `object_follower.py` script** into the `/ROS/arctos_moveit/scripts` folder:
@@ -67,13 +67,29 @@ After building your workspace, make sure to source it:
 source devel/setup.bash
 ```
 
-### Step 5: Run the Computer Vision Script
+### Step 5: Run the YOLO Node
 
-Ensure that the necessary nodes for YOLO and your robotic arm are running, then execute the object follower script using Python 3:
+Before running the object follower script, you need to start the YOLO node. In a new terminal, run:
 
 ```bash
-python3 object_follower.py
+roslaunch darknet_ros darknet_ros.launch
 ```
+
+### Step 6: Run Camera Preview or Bounding Box
+
+To visualize the camera feed or bounding boxes, you can run the following commands in separate terminals:
+
+- For camera feed:
+
+   ```bash
+   rostopic echo /usb_cam/image_raw
+   ```
+
+- For bounding boxes:
+
+   ```bash
+   rostopic echo /darknet_ros/bounding_boxes
+   ```
 
 ## Usage
 
