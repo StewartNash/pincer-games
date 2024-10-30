@@ -74,6 +74,9 @@ Before running the object follower script, you need to start the YOLO node. In a
 ```bash
 roslaunch darknet_ros darknet_ros.launch
 ```
+```
+roslaunch usb_cam usb_cam-test.launch
+```
 
 ### Step 6: Run Camera Preview or Bounding Box
 
