@@ -1,114 +1,136 @@
+Here's a full **GitHub README.md** file you can include in your repository to guide users on running the YOLOv3-driven Tic Tac Toe game:
 
 ---
 
-# Computer Vision for Arctos robotic Arm
+# 🎮 YOLOv3 Tic Tac Toe Game
 
-## Overview
-
-This project enables a robotic arm to utilize computer vision for object detection, specifically turning to face cats and dogs using YOLO v3 (You Only Look Once). The robotic arm uses ROS (Robot Operating System) for communication and control.
-
-## Features
-
-- Detects and identifies objects (cats and dogs) using YOLO v3.
-- Commands the robotic arm to turn based on the detected object.
-- Easily customizable for additional object recognition and actions.
-
-## Requirements
-
-- ROS (Robot Operating System) installed.
-- MoveIt! for motion planning and control.
-- Darknet and YOLO v3 model for object detection.
-- Python 3 and required Python packages.
-
-## Installation
-
-### Step 1: Set Up Arctos Robotic Arm in ROS
-
-Follow the instructions provided in the [Arctos Robotic Arm ROS Setup Guide](https://github.com/ArctosRobotics/ROS) to set up your robotic arm in ROS.
-
-### Step 2: [Install Darknet and YOLO v3](https://github.com/leggedrobotics/darknet_ros)
-
-Clone the `darknet_ros` repository:
-
-```bash
-git clone https://github.com/leggedrobotics/darknet_ros.git
-```
-
-Follow the instructions in the `darknet_ros` repository to build and configure YOLO v3.
-
-### Step 3: Set Up the Computer Vision Control Package
-
-This repository will only contain the `object_follower.py` script. Follow these steps:
-
-1. **Clone this repository** (replace `<YOUR_REPOSITORY_URL>` with your actual repository URL):
-
-   ```bash
-   git clone https://github.com/ArctosRobotics/Computer-vision
-   ```
-
-2. **Copy the `object_follower.py` script** into the `/ROS/arctos_moveit/scripts` folder:
-
-   ```bash
-   cp <YOUR_PATH_TO_OBJECT_FOLLOWER>/object_follower.py ~/ROS/src/arctos_moveit/scripts/
-   ```
-
-3. **Build the package**:
-
-   ```bash
-   cd ~/ROS
-   catkin build
-   ```
-
-### Step 4: Source the Workspace
-
-After building your workspace, make sure to source it:
-
-```bash
-source devel/setup.bash
-```
-
-### Step 5: Run the YOLO Node
-
-Before running the object follower script, you need to start the YOLO node. In a new terminal, run:
-
-```bash
-roslaunch darknet_ros darknet_ros.launch
-```
-```
-roslaunch usb_cam usb_cam-test.launch
-```
-
-### Step 6: Run Camera Preview or Bounding Box
-
-To visualize the camera feed or bounding boxes, you can run the following commands in separate terminals:
-
-- For camera feed:
-
-   ```bash
-   rostopic echo /usb_cam/image_raw
-   ```
-
-- For bounding boxes:
-
-   ```bash
-   rostopic echo /darknet_ros/bounding_boxes
-   ```
-
-## Usage
-
-Once the computer vision script is running, the robotic arm will respond to detected objects. It will turn to face cats and turn back to face dogs. You can customize the behavior by modifying the `object_follower.py` script.
-
-## Troubleshooting
-
-- Ensure that all dependencies are installed and correctly configured.
-- If the arm does not respond as expected, check the output of the ROS nodes for error messages.
-
-## Contributing
-
-Contributions are welcome! Please open an issue or submit a pull request for any enhancements or bug fixes.
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This repository provides a fun, pre-configured Tic Tac Toe game where the computer uses **YOLOv3** for computer vision to play Tic Tac Toe against a human player. The system is ready to run inside a virtual machine (VM) with **ROS (Robot Operating System)** and **darknet_ros** already set up.
 
 ---
+
+## ⚙️ Requirements
+
+- **Virtual Machine** (pre-configured): Download the VM here 👉 [Download Link](https://drive.google.com/file/d/1cVKMfZAvwdyCzfT6W0BRXgDmTI7lBqS5/view?usp=sharing)
+- **USB Camera**
+- **Arduino Board**
+
+---
+
+## 📥 Setup Instructions
+
+Follow these steps to run the Tic Tac Toe game:
+
+### 1. Download the Virtual Machine
+
+1. Download the pre-configured Virtual Machine from the link above.
+2. Import the VM into **VirtualBox** or your preferred virtualization software.
+
+### 2. Connect Devices
+
+1. Open the Virtual Machine.
+2. In the top menu, go to **Devices > USB >** and select:
+   - Your connected **USB Camera**.
+   - Your connected **Arduino** board.
+
+---
+
+## ▶️ Run the Game
+
+The game can be launched automatically through the desktop app provided. Follow these steps:
+
+### Method 1: Run the Desktop App (Automatic)
+
+1. Double-click the desktop shortcut **"Arctos CV"** on the virtual machine's desktop.
+
+This shortcut will:
+- Launch all necessary ROS nodes:
+   - YOLOv3 for object detection.
+   - USB Camera driver.
+- Start the Tic Tac Toe script `tictac.py`.
+
+### Method 2: Run Manually
+
+If you prefer to run the game manually, follow these steps:
+
+1. **Open Terminal** and source ROS environment:
+
+   ```bash
+   source /opt/ros/melodic/setup.bash
+   source ~/catkin_workspace/devel/setup.bash
+   ```
+
+2. **Launch YOLOv3** for object detection:
+
+   ```bash
+   roslaunch darknet_ros darknet_ros.launch
+   ```
+
+3. **Launch the USB Camera** node:
+
+   ```bash
+   roslaunch usb_cam usb_cam-test.launch
+   ```
+
+4. **Run the Tic Tac Toe script**:
+
+   ```bash
+   python3 ~/catkin_workspace/src/darknet_ros/darknet/scripts/tictac.py
+   ```
+
+---
+
+## 🧩 Script Details: `tictac.py`
+
+The `tictac.py` script is responsible for:
+
+1. **Listening** to YOLOv3 bounding boxes for move detection.
+2. **Controlling the robotic arm** to place the "X" marker at the correct position.
+3. Managing the Tic Tac Toe game logic and updating the board state.
+
+### Key Features:
+- **ASCII Art:** The script prints ASCII art messages to indicate the winner (Robot, Human, or Tie).
+- **Reset Option:** Press `r` and Enter to restart the game at any time.
+- **Move Validation:** Detects and validates moves using bounding boxes.
+
+---
+
+## 🔧 Customize the Script
+
+If you want to customize the game or change behavior, edit the `tictac.py` script located here:
+
+```bash
+~/catkin_workspace/src/darknet_ros/darknet/scripts/tictac.py
+```
+
+For example:
+- Modify board positions.
+- Change robot move strategies.
+- Add new visual effects.
+
+---
+
+## 🎉 Enjoy Playing!
+
+Once everything is running, enjoy challenging the robot to a Tic Tac Toe game powered by **computer vision**!
+
+---
+
+## 💬 Troubleshooting
+
+If you encounter issues:
+- Make sure all devices (camera, Arduino) are correctly connected to the virtual machine.
+- Verify the ROS nodes are running properly using `rosnode list`.
+- Check for errors in the terminal when running `tictac.py`.
+
+---
+
+### 🤝 Credits
+- **Darknet YOLOv3:** For real-time object detection.
+- **ROS Melodic:** For handling robotic commands and environment.
+
+---
+
+**Feel free to fork this repository, modify the script, and have fun building your own AI-driven games!**
+
+---
+
