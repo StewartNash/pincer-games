@@ -1,5 +1,8 @@
 #pragma once
 
+#include <chrono>
+#include <functional>
+#include <memory>
 #include <string>
 
 #include "rclcpp/rclcpp.hpp"
@@ -42,8 +45,11 @@ class TicTacToe : public rclcpp::Node {
 		char lastDetectedBoard[9];
 		bool waitingForHuman;
 		bool gameActive;
-		
-		
-}
+	private:
+		void timer_callback();
+		rclcpp::TimerBase::SharedPtr timer_;
+		rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
+		size_t count_;
+};
 
 }

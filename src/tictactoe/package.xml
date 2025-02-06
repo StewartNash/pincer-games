@@ -3,11 +3,14 @@
 <package format="3">
   <name>tictactoe</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="pervigilent@gmail.com">stewart</maintainer>
+  <description>TicTacToe Node for Arctos robot arm Pincer</description>
+  <maintainer email="pervigilent@gmail.com">StewartNash</maintainer>
   <license>TODO: License declaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>std_msgs</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

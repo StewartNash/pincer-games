@@ -10,6 +10,15 @@ find_package(ament_cmake REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(std_msgs REQUIRED)
+
+add_executable(main_node src/pincergames_node.cpp src/pincergames.cpp)
+ament_target_dependencies(main_node rclcpp std_msgs)
+
+install(TARGETS
+  main_node 
+  DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
