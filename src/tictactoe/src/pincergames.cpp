@@ -53,8 +53,10 @@ TicTacToe::TicTacToe() : rclcpp::Node("tic_tac_toe_robot"), count_(0) {
 	std::cout << "\nPress 'r' and Enter to restart the game at any time" << std::endl;
 
 	publisher_ = this->create_publisher<std_msgs::msg::String>("ui_command", 10);
-	//timer_ = this->create_wall_timer(500ms, std::bind(&TicTacToe::timer_callback, this));
-	timer_ = this->create_wall_timer(std::literals::chrono_literals::operator""ms(500), std::bind(&TicTacToe::timer_callback, this));
+	////timer_ = this->create_wall_timer(500ms, std::bind(&TicTacToe::timer_callback, this));
+	//timer_ = this->create_wall_timer(std::literals::chrono_literals::operator""ms(500), std::bind(&TicTacToe::timer_callback, this));
+	//subscription_ = this->create_subscription<std_msgs::msg::String>("/darknet_ros/bounding_boxes", BoundingBoxes, boundingBoxesCallback, 1);
+	subscription_ = this->create_subscription<std_msgs::msg::String>("/darknet_emulator/bounding_boxes", BoundingBoxes, boundingBoxesCallback, 1);
 }
 
 TicTacToe::~TicTacToe() {
@@ -66,14 +68,14 @@ TicTacToe::~TicTacToe() {
 	publisher_.reset();
 	timer_.reset();
 }
-
+/*
 void TicTacToe::timer_callback() {
 	auto message = std_msgs::msg::String();
 	message.data = "TicTacToe " + std::to_string(count_++);
 	RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
 	publisher_->publish(message);
 }
-
+*/
 void TicTacToe::handleKeyboardInput() {
 	char userInput;
 	while (!stopThread.load()) {
@@ -101,6 +103,23 @@ void TicTacToe::resetGame() {
 	clearTerminal();
 	displayBoard();
 	std::cout << "\nWaiting for moves... (X: Robot, O: Human)" << std::endl;
+}
+
+void TicTacToe::boundingBoxCallback(auto data) {
+	// Process all detected symbols and update the board state
+	if (!gameActive || !waitingForHuman) {
+		return;
+	}
+
+	std::strcpy(currentBoard, committedMoves);
+
+	// Process all detected boxes
+
+	// Check if new valid O move has been made
+	if (!srtcmp(currentBoard, lastDetectedBoard) {
+
+	}
+	return;
 }
 
 void TicTacToe::clearTerminal() {

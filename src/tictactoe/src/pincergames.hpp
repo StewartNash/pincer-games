@@ -1,7 +1,7 @@
 #pragma once
 
-#include <chrono>
-#include <functional>
+//#include <chrono>
+//#include <functional>
 #include <memory>
 #include <string>
 #include <thread>
@@ -10,6 +10,7 @@
 #include <atomic>
 #include <map>
 #include <array>
+#include <cstring>
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
@@ -58,9 +59,10 @@ class TicTacToe : public rclcpp::Node {
 		
 		std::map<std::string, std::array<std::array<double, 3>, NUMBER_OF_POSITIONS>> positions;
 	private:
-		void timer_callback();
-		rclcpp::TimerBase::SharedPtr timer_;
+		//void timer_callback();
+		//rclcpp::TimerBase::SharedPtr timer_;
 		rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
+		rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_;
 		size_t count_;
 		
 		std::thread inputThread; // Create keyboard input thread for reset
@@ -68,6 +70,7 @@ class TicTacToe : public rclcpp::Node {
 		
 		void handleKeyboardInput();
 		void resetGame();
+		void boundingBoxesCallback(auto data);
 		void clearTerminal();
 		void displayBoard();
 };
