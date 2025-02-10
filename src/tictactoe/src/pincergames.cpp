@@ -52,11 +52,11 @@ TicTacToe::TicTacToe() : rclcpp::Node("tic_tac_toe_robot"), count_(0) {
 	std::cout << "\nWaiting for moves... (X: Robot, O: Human)" << std::endl;
 	std::cout << "\nPress 'r' and Enter to restart the game at any time" << std::endl;
 
-	publisher_ = this->create_publisher<std_msgs::msg::String>("ui_command", 10);
+	commandPublisher_ = this->create_publisher<std_msgs::msg::String>("ui_command", 10);
 	////timer_ = this->create_wall_timer(500ms, std::bind(&TicTacToe::timer_callback, this));
 	//timer_ = this->create_wall_timer(std::literals::chrono_literals::operator""ms(500), std::bind(&TicTacToe::timer_callback, this));
-	//subscription_ = this->create_subscription<std_msgs::msg::String>("/darknet_ros/bounding_boxes", BoundingBoxes, boundingBoxesCallback, 1);
-	subscription_ = this->create_subscription<std_msgs::msg::String>("/darknet_emulator/bounding_boxes", BoundingBoxes, boundingBoxesCallback, 1);
+	//subscription_ = this->create_subscription<std_msgs::msg::String>("/darknet_ros/bounding_boxes", darknet_emulator::msg::BoundingBoxes, boundingBoxesCallback, 1);
+	boundingBoxesSubscriber_ = this->create_subscription<darknet_emulator::msg::BoundingBoxes>("darknet_emulator/bounding_boxes", 1,  std::bind(&TicTacToe::boundingBoxesCallback, this, std::placeholders::_1));
 }
 
 TicTacToe::~TicTacToe() {
@@ -65,8 +65,8 @@ TicTacToe::~TicTacToe() {
 		inputThread.join();
 	}
 
-	publisher_.reset();
-	timer_.reset();
+	commandPublisher_.reset();
+	//timer_.reset();
 }
 /*
 void TicTacToe::timer_callback() {
@@ -105,7 +105,9 @@ void TicTacToe::resetGame() {
 	std::cout << "\nWaiting for moves... (X: Robot, O: Human)" << std::endl;
 }
 
-void TicTacToe::boundingBoxCallback(auto data) {
+void TicTacToe::boundingBoxesCallback(const darknet_emulator::msg::BoundingBoxes data) const {
+	char currentBoard[9];
+	
 	// Process all detected symbols and update the board state
 	if (!gameActive || !waitingForHuman) {
 		return;
@@ -114,9 +116,12 @@ void TicTacToe::boundingBoxCallback(auto data) {
 	std::strcpy(currentBoard, committedMoves);
 
 	// Process all detected boxes
-
+	for (darknet_emulator::msg::BoundingBox obj : data.bounding_boxes) {
+	
+	}
+	
 	// Check if new valid O move has been made
-	if (!srtcmp(currentBoard, lastDetectedBoard) {
+	if (!std::strcmp(currentBoard, lastDetectedBoard)) {
 
 	}
 	return;
