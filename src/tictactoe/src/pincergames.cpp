@@ -105,8 +105,24 @@ void TicTacToe::resetGame() {
 	std::cout << "\nWaiting for moves... (X: Robot, O: Human)" << std::endl;
 }
 
+int TicTacToe::findBestMove() {
+	// Check if we can win in the next move
+	for (int i = 0; i < BOARD_POSITIONS; i++) {
+		if (boardState[i] == '\0') {
+			boardState[i] = 'X';
+			if (checkWinner()) {
+				boardState[i] = '\0';
+				return i;
+			}
+			boardState[i] = '\0';
+		}
+	}
+	
+	return -1;
+}
+
 void TicTacToe::boundingBoxesCallback(const darknet_emulator::msg::BoundingBoxes data) const {
-	char currentBoard[9];
+	char currentBoard[BOARD_POSITIONS];
 	
 	// Process all detected symbols and update the board state
 	if (!gameActive || !waitingForHuman) {
@@ -131,6 +147,64 @@ void TicTacToe::clearTerminal() {
 	std::cout << "\033[2J\033[1;1H";
 }
 
-void TicTacToe::displayBoard() {
+bool TicTacToe::checkWinner() {
+	// Check for a winner in any direction
+	
+	return false;
+}
 
+void TicTacToe::displayBoard() {
+	int row[BOARD_SIZE];
+	int startPosition;
+	int endPosition;
+	int sliceLength;
+	
+	// Display the current game board in the terminal
+	clearTerminal();
+	std::cout << "\n╔═══╦═══╦═══╗" << std::endl;
+	for (int i = 0; i  < BOARD_SIZE; i++) {
+		startPosition = i * BOARD_SIZE;
+		endPosition = (i + 1) * BOARD_SIZE;
+		sliceLength = endPosition - startPosition;
+		// Assign slice
+		for (int j = 0; j < sliceLength; j++) {
+			char temporary;
+			temporary = committedMoves[startPosition + j];
+			if (temporary == '\0') {
+				row[j] = ' ';
+			} else {
+				row[j] = temporary;
+			}
+		}
+		std::cout << "║ ";
+		std::cout << row[0];
+		std::cout << " ║ ";
+		std::cout << row[1];
+		std::cout << " ║ ";
+		std::cout << row[2];
+		std::cout << " ║";
+		std::cout << std::endl;
+		if (i < 2) {
+			std::cout << "╠═══╬═══╬═══╣" << std::endl;
+		}		
+	}
+	std::cout << "╚═══╩═══╩═══╝" << std::endl;
+	
+	// Print current state
+	if (!gameActive) {
+		if (checkWinner()) {
+			if (currentTurn == 'X') {
+				std::cout << HUMAN_WINS;
+			} else {
+				std::cout << ROBOT_WINS;
+			}
+		} else {
+			std::cout << TIE_GAME;
+		}
+		std::cout << "\nPress 'r' and Enter to restart" << std::endl;
+	} else if (waitingForHuman) {
+		std::cout << "\nWaiting for human move..." << std::endl;
+	} else {
+		std::cout << "\nRobot is thinking..." << std::endl;
+	}
 }

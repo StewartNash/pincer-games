@@ -48,13 +48,15 @@ const std::string TIE_GAME = "\
 class TicTacToe : public rclcpp::Node {
 	public:
 		static constexpr int NUMBER_OF_POSITIONS = 19;
+		static constexpr int BOARD_POSITIONS = 9;
+		static constexpr int BOARD_SIZE = 9;
 		
 		TicTacToe();
 		~TicTacToe();
 
-		char boardState[9]; // Current visual state
-		char committedMoves[9]; // Memory of committed moves
-		char lastDetectedBoard[9]; // Store last detected board state
+		char boardState[BOARD_POSITIONS]; // Current visual state
+		char committedMoves[BOARD_POSITIONS]; // Memory of committed moves
+		char lastDetectedBoard[BOARD_POSITIONS]; // Store last detected board state
 		
 		char currentTurn; // X is robot and O is human
 		short currentFigure; // Track which figure to use next (1 - 5)		
@@ -77,8 +79,10 @@ class TicTacToe : public rclcpp::Node {
 		
 		void handleKeyboardInput();
 		void resetGame();
+		int findBestMove();
 		void boundingBoxesCallback(const darknet_emulator::msg::BoundingBoxes data) const;
 		void clearTerminal();
+		bool checkWinner();
 		void displayBoard();
 };
 
