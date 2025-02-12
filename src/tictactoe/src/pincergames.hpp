@@ -50,6 +50,7 @@ class TicTacToe : public rclcpp::Node {
 		static constexpr int NUMBER_OF_POSITIONS = 19;
 		static constexpr int BOARD_POSITIONS = 9;
 		static constexpr int BOARD_SIZE = 9;
+		static constexpr int CENTER_POSITION = 4;
 		
 		TicTacToe();
 		~TicTacToe();

@@ -118,6 +118,23 @@ int TicTacToe::findBestMove() {
 		}
 	}
 	
+	// Check if opponent can win in their next move and block them
+	for (int i = 0; i < BOARD_POSITIONS; i++) {
+		if (boardState[i] == '\0') {
+			boardState[i] = 'O';
+			if checkWinner() {
+				boardState[i] = '\0';
+				return i;
+			}
+			boardState[i] = '\0';
+		}
+	}
+	
+	// Take center if available
+	if (boardState[CENTER_POSITION] == '\0') {
+		return CENTER_POSITION;
+	}	
+	
 	return -1;
 }
 
