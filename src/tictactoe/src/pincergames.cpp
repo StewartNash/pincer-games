@@ -106,6 +106,10 @@ void TicTacToe::resetGame() {
 }
 
 int TicTacToe::findBestMove() {
+	const int NUMBER_OF_CORNERS = 4;
+	const int NUMBER_OF_EDGES = 4;
+	int corners[NUMBER_OF_CORNERS] = {0, 2, 6, 8};
+	int edges[NUMBER_OF_EDGES] = {1, 3, 5, 7};
 	// Check if we can win in the next move
 	for (int i = 0; i < BOARD_POSITIONS; i++) {
 		if (boardState[i] == '\0') {
@@ -122,7 +126,7 @@ int TicTacToe::findBestMove() {
 	for (int i = 0; i < BOARD_POSITIONS; i++) {
 		if (boardState[i] == '\0') {
 			boardState[i] = 'O';
-			if checkWinner() {
+			if (checkWinner()) {
 				boardState[i] = '\0';
 				return i;
 			}
@@ -134,7 +138,24 @@ int TicTacToe::findBestMove() {
 	if (boardState[CENTER_POSITION] == '\0') {
 		return CENTER_POSITION;
 	}	
-	
+
+	// Take corners if available
+	for (int i = 0; i < NUMBER_OF_CORNERS; i++) {
+		if (boardState[corners[i]] == '\0') {
+			//int availableCorner = corners[i];
+			//return availableCorner;
+			return corners[i];
+		}
+	}
+
+	// Take any available edge
+	for (int i = 0; i < NUMBER_OF_EDGES; i++) {
+		if (boardState[edges[i]] == '\0') {
+			//int availableEdge = edges[i];
+			//return availableEdge;
+			return edges[i];
+		}
+	}
 	return -1;
 }
 
@@ -224,4 +245,59 @@ void TicTacToe::displayBoard() {
 	} else {
 		std::cout << "\nRobot is thinking..." << std::endl;
 	}
+}
+
+void TicTacToe::moveToCoordinates(double coords[3]) {
+	double j1, j2, j3, j4, j5, j6;
+
+	j1 = coords[0];
+	j2 = coords[1];
+	j3 = coords[2];
+	j4 = 0.0;
+	j5 = 0.0;
+	j6 = 0.0;
+
+	auto command = std_msgs::msg::String();
+	//TODO: Set precision to 4
+	command.data = "go_to_joint_state," + std::to_string(j1) + ",";
+	command.data += std::to_string(j2) + "," + std::to_string(j3) + ",";
+	command.data += std::to_string(j4) + "," + std::to_string(j5) + ",";
+	command.data += std::to_string(j6);
+	std::cout << "\n==================================================";
+	std::cout << std::endl << "SENDING MOVEMENT COMMAND:" << std::endl;
+	std::cout << "Raw coordinates: " << std::to_string(j1) << ",";
+	std::cout << std::to_string(j2) << "," << std::to_string(j3);
+	std::cout << std::endl;
+	std::cout << "==================================================\n";
+	
+	commandPublisher_->publish(command);
+	//TODO: Insert 0.5 second sleep
+}
+
+void TicTacToe::moveToCoordinates(double coords[3][2]) {
+	double j1, j2, j3, j4, j5, j6;
+
+	j1 = coords[0][0];
+	j2 = coords[1][0];
+	j3 = coords[2][0];
+	j4 = coords[0][1];
+	j5 = coords[1][1];
+	j6 = coords[2][1];
+
+	auto command = std_msgs::msg::String();
+	//TODO: Set precision to 4
+	command.data = "go_to_joint_state," + std::to_string(j1) + ",";
+	command.data += std::to_string(j2) + "," + std::to_string(j3) + ",";
+	command.data += std::to_string(j4) + "," + std::to_string(j5) + ",";
+	command.data += std::to_string(j6);
+	std::cout << "\n==================================================";
+	std::cout << std::endl << "SENDING MOVEMENT COMMAND:" << std::endl;
+	std::cout << "Raw coordinates: " << std::to_string(j1) << ",";
+	std::cout << std::to_string(j2) << "," << std::to_string(j3);
+	std::cout << " " << std::to_string(j4) << "," << std::to_string(j5);
+	std::cout << "," << std::to_string(j6) << std::endl;
+	std::cout << "==================================================\n";
+	
+	commandPublisher_->publish(command);
+	//TODO: Insert 0.5 second sleep
 }

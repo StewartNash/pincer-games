@@ -85,6 +85,8 @@ class TicTacToe : public rclcpp::Node {
 		void clearTerminal();
 		bool checkWinner();
 		void displayBoard();
+		void moveToCoordinates(double coords[3]);
+		void moveToCoordinates(double coords[3][2]);
 };
 
 }
