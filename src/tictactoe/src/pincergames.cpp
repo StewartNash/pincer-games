@@ -185,7 +185,7 @@ void TicTacToe::clearTerminal() {
 	std::cout << "\033[2J\033[1;1H";
 }
 
-int TicTacToe::mapBoundingBoxToGrid(auto box) {
+int TicTacToe::mapBoundingBoxToGrid(darknet_emulator::msg::BoundingBox box) {
 	double boxXCenter, boxYCenter;
 	double leftBoundary, rightBoundary, topBoundary, bottomBoundary;
 	double xPos, yPos;;
@@ -290,13 +290,66 @@ void TicTacToe::displayBoard() {
 	}
 }
 
-void TicTacToe::moveToPosition(auto positionKey) {
+void TicTacToe::moveToPosition(std::string positionKey) {
 	double apPosition[3];
 
 }
 
-void TicTacToe::pickAndPlace(auto targetPosition) {
+void TicTacToe::pickAndPlace(int targetPosition) {
+	std::string figurePos, tablePos;
+	auto temporary = std_msgs::msg::String();
+	
+	figurePos = std::to_string(currentFigure);
+	tablePos = "T" + std::to_string(targetPosition + 1);
+	
+	updateDisplay("Starting pick and place sequence for figure " +
+	  figurePos + " to position " + tablePos);
+	
+	// Pick sequence
+	updateDisplay("Opening gripper");
+	temporary.data = "open_gripper";
+	commandPublisher_->publish(temporary);
+	//xogcode.main(null, serialPort, "open");
 
+	updateDisplay("Moving to approach position " + figurePos + "AP");
+	moveToCoordinates(positions[figurePos + "AP"]);
+	//xogcode.main(figurePos + "AP", serialPort);
+	
+	// Continue with all movements, updating display each time
+	updateDisplay("Moving to pick position " + figurePos);
+	moveToCoordinates(positions[figurePos]);
+	//xogcode.main(figurePos, serialPort);
+	
+	updateDisplay("Closing gripper");
+	temporary.data = "close_gripper";
+	commandPublisher_->publish(temporary);
+	//xogcode.main(null, serialPort, "close");
+	
+	updateDisplay("Returning to approach position " + figurePos + "AP");
+	moveToCoordinates(positions[figurePos + "AP"]);
+	//xogcode.main(figurePos + "AP", serialPort);
+	
+	updateDisplay("Moving to top position");
+	//xogcode.main("top", serialPort);
+	
+	updateDisplay("Moving to approach position " + tablePos + "AP");
+	moveToCoordinates(positions[tablePos]);
+	//xogcode.main(tablePos, serialPort);
+	
+	updateDisplay("Opening gripper");
+	temporary.data = "open_gripper";
+	commandPublisher_->publish(temporary);
+	//xogcode.main(null, serialPort, "open");
+	
+	updateDisplay("Returning to approach position " + tablePos + "AP");
+	moveToCoordinates(positions[tablePos + "AP"]);
+	//xogcode.main(tablePos + "AP", serialPort);
+	
+	updateDisplay("Moving to top position");
+	//xogcode.main("top", serialPort);
+	
+	updateDisplay("Moving to park position");
+	//xogcode.main("park", serialPort);
 }
 
 void TicTacToe::moveToCoordinates(double coords[3]) {
@@ -354,10 +407,36 @@ void TicTacToe::moveToCoordinates(double coords[3][2]) {
 	//TODO: Insert 0.5 second sleep
 }
 
+void TicTacToe::moveToCoordinates(std::array<double, 3> coords) {
+	double output[3];
+	
+	for (int i = 0; i < 3; i++) {
+		  output[i] = coords[i];
+	}
+	moveToCoordinates(output);	
+}
+
+void TicTacToe::moveToCoordinates(std::array<std::array<double, 3>, 2> coords) {
+	double output[3][2];
+	
+	for (int i = 0; i < 2; i++) {
+		for (int j = 0; j < 3; j++) {
+		  output[j][i] = coords[i][j];
+		}
+	}
+	moveToCoordinates(output);	
+}
+
 std::string TicTacToe::updateGripperState(std::string action) {
 	std::string output = "gripper_command,";
 	
 	output += (action == "open") ? "open" : "close";
 
 	return output;
+}
+
+void TicTacToe::updateDisplay(std::string status) {
+	clearTerminal();
+	displayBoard();
+	std::cout << "\nRobot action: " << status << std::endl;
 }

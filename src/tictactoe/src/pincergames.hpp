@@ -66,14 +66,11 @@ class TicTacToe : public rclcpp::Node {
 		bool gameActive;
 		bool waitingForHuman;
 		
-		std::map<std::string, std::array<std::array<double, 3>, NUMBER_OF_POSITIONS>> positions;
+		std::map<std::string, std::array<std::array<double, 3>, 2>> positions;
 	private:
 		//void timer_callback();
 		//rclcpp::TimerBase::SharedPtr timer_;
-		//rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
-		//rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_;
 		rclcpp::Publisher<std_msgs::msg::String>::SharedPtr commandPublisher_;
-		//rclcpp::Subscription<darknet_emulator::msg::BoundingBoxes>::SharedPtr boundingBoxesSubscriber_;
 		rclcpp::Subscription<darknet_emulator::msg::BoundingBoxes>::SharedPtr boundingBoxesSubscriber_;
 		size_t count_;
 		
@@ -85,14 +82,17 @@ class TicTacToe : public rclcpp::Node {
 		int findBestMove();
 		void boundingBoxesCallback(const darknet_emulator::msg::BoundingBoxes data) const;
 		void clearTerminal();
-		int mapBoundingBoxToGrid(auto box);
+		int mapBoundingBoxToGrid(darknet_emulator::msg::BoundingBox box);
 		bool checkWinner();
 		void displayBoard();
-		void moveToPosition(auto positionKey);
-		void pickAndPlace(auto targetPosition);
+		void moveToPosition(std::string positionKey);
+		void pickAndPlace(int targetPosition);
 		void moveToCoordinates(double coords[3]);
 		void moveToCoordinates(double coords[3][2]);
+		void moveToCoordinates(std::array<double, 3> coords);
+		void moveToCoordinates(std::array<std::array<double, 3>, 2> coords);
 		std::string updateGripperState(std::string action);
+		void updateDisplay(std::string status);
 };
 
 }
