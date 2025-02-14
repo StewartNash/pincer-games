@@ -11,6 +11,8 @@
 #include <map>
 #include <array>
 #include <cstring>
+#include <vector>
+#include <tuple>
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
@@ -83,10 +85,14 @@ class TicTacToe : public rclcpp::Node {
 		int findBestMove();
 		void boundingBoxesCallback(const darknet_emulator::msg::BoundingBoxes data) const;
 		void clearTerminal();
+		int mapBoundingBoxToGrid(auto box);
 		bool checkWinner();
 		void displayBoard();
+		void moveToPosition(auto positionKey);
+		void pickAndPlace(auto targetPosition);
 		void moveToCoordinates(double coords[3]);
 		void moveToCoordinates(double coords[3][2]);
+		std::string updateGripperState(std::string action);
 };
 
 }

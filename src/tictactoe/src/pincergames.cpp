@@ -185,8 +185,51 @@ void TicTacToe::clearTerminal() {
 	std::cout << "\033[2J\033[1;1H";
 }
 
+int TicTacToe::mapBoundingBoxToGrid(auto box) {
+	double boxXCenter, boxYCenter;
+	double leftBoundary, rightBoundary, topBoundary, bottomBoundary;
+	double xPos, yPos;;
+	int gridX, gridY;
+
+	boxXCenter = (box.xmin + box.xmax) / 2.0;
+	boxYCenter = (box.ymin + box.ymax) / 2.0;
+
+	leftBoundary = 197.0;
+	rightBoundary = 598.0;
+	topBoundary = 25.0;
+	bottomBoundary = 431.0;
+
+	xPos = (boxXCenter - leftBoundary) / (rightBoundary - leftBoundary);
+	yPos = (boxYCenter - topBoundary) / (bottomBoundary - topBoundary);
+
+	gridX = static_cast<int>(xPos * 3.0);
+	gridY = static_cast<int>(yPos * 3.0);
+
+	if (0 <= gridX && gridX <= 3 && 0 <= gridY && gridY < 3) {
+		return gridY * 3 + gridX;
+	}
+	return -1;
+}
+	
 bool TicTacToe::checkWinner() {
 	// Check for a winner in any direction
+	std::vector<std::tuple<int, int, int>> winConditions = {
+		{0, 1, 2}, {3, 4, 5}, {6, 7, 8}, // Rows
+		{0, 3, 6}, {1, 4, 7}, {2, 5, 8}, // Columns
+		{0, 4, 8}, {2, 4, 6} // Diagonals
+	};
+
+	for (const auto& condition : winConditions) {
+		int a = std::get<0>(condition);
+		int b = std::get<1>(condition);
+		int c = std::get<2>(condition);
+
+		if (boardState[a] == boardState[b] &&
+			boardState[b] == boardState[c] &&
+			boardState[c] != '\0') {
+			return true;
+		}
+	}
 	
 	return false;
 }
@@ -247,6 +290,15 @@ void TicTacToe::displayBoard() {
 	}
 }
 
+void TicTacToe::moveToPosition(auto positionKey) {
+	double apPosition[3];
+
+}
+
+void TicTacToe::pickAndPlace(auto targetPosition) {
+
+}
+
 void TicTacToe::moveToCoordinates(double coords[3]) {
 	double j1, j2, j3, j4, j5, j6;
 
@@ -300,4 +352,12 @@ void TicTacToe::moveToCoordinates(double coords[3][2]) {
 	
 	commandPublisher_->publish(command);
 	//TODO: Insert 0.5 second sleep
+}
+
+std::string TicTacToe::updateGripperState(std::string action) {
+	std::string output = "gripper_command,";
+	
+	output += (action == "open") ? "open" : "close";
+
+	return output;
 }
