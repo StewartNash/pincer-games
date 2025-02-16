@@ -1,16 +1,26 @@
-Here's a full **GitHub README.md** file you can include in your repository to guide users on running the YOLOv3-driven Tic Tac Toe game:
+# Pincer Games
+
++ Tic Tac Toe
++ Checkers
++ Chess
++ Backgammon
++ Go
+
+Games for a variant of the Arctos robotic arm called 'Pincer'. These games are developed from a fork of the tic tac toe computer vision repository provided by Arctos robotics. 
+
+The system is ready to run inside a virtual machine (VM) with **ROS (Robot Operating System)** and **darknet_ros** already set up.
 
 ---
 
 # 🎮 YOLOv3 Tic Tac Toe Game
 
-This repository provides a fun, pre-configured Tic Tac Toe game where the computer uses **YOLOv3** for computer vision to play Tic Tac Toe against a human player. The system is ready to run inside a virtual machine (VM) with **ROS (Robot Operating System)** and **darknet_ros** already set up.
+This repository provides a pre-configured Tic Tac Toe game where the computer uses **YOLOv3** for computer vision to play Tic Tac Toe against a human player.
 
 ---
 
 ## ⚙️ Requirements
 
-- **Virtual Machine** (pre-configured): Download the VM here 👉 [Download Link](https://drive.google.com/file/d/1cVKMfZAvwdyCzfT6W0BRXgDmTI7lBqS5/view?usp=sharing)
+- **Computer with ROS**
 - **USB Camera**
 - **Arduino Board**
 
@@ -18,12 +28,12 @@ This repository provides a fun, pre-configured Tic Tac Toe game where the comput
 
 ## 📥 Setup Instructions
 
-Follow these steps to run the Tic Tac Toe game:
+Follow these steps to run the any game:
 
-### 1. Download the Virtual Machine
+### 1. Clone the repository
 
-1. Download the pre-configured Virtual Machine from the link above.
-2. Import the VM into **VirtualBox** or your preferred virtualization software.
+1. Clone the github repository
+2. Build the ROS code.
 
 ### 2. Connect Devices
 
@@ -31,6 +41,10 @@ Follow these steps to run the Tic Tac Toe game:
 2. In the top menu, go to **Devices > USB >** and select:
    - Your connected **USB Camera**.
    - Your connected **Arduino** board.
+   
+### 3. Emulator
+
+Emulators can be run in place of physical hardware.
 
 ---
 
@@ -126,11 +140,7 @@ If you encounter issues:
 
 ### 🤝 Credits
 - **Darknet YOLOv3:** For real-time object detection.
-- **ROS Melodic:** For handling robotic commands and environment.
-
----
-
-**Feel free to fork this repository, modify the script, and have fun building your own AI-driven games!**
-
+- **ROS Jazzy Jalisco:** For handling robotic commands and environment.
+- **Arctos Robotics:** For providing robots.
 ---
 

@@ -291,8 +291,34 @@ void TicTacToe::displayBoard() {
 }
 
 void TicTacToe::moveToPosition(std::string positionKey) {
-	double apPosition[3];
+	// Move to a specific position with approach position handling
+	std::array<std::array<double, 3>, 2> apPosition;
+	std::array<std::array<double, 3>, 2> targetPosition;
 
+	if (positions.count(positionKey) > 0) { // Key exists
+		std::cout << "\nMoving to position: " << positionKey << std::endl;
+
+		// Move to approach position
+		std::cout << "-> Approach position " << positionKey << "AP";
+		std::cout << std::endl;
+		apPosition = positions[positionKey + "AP"]; // get complete position tuple
+		moveToCoordinates(apPosition);
+
+		// Move to target position
+		std::cout << "-> Target position " << positionKey << std::endl;
+		targetPosition = positions[positionKey]; // Get complete position tuple
+		moveToCoordinates(targetPosition);
+
+		// Return to approach position
+		std::cout << "-> Return to approach position " << positionKey << "AP";
+		std::cout << std::endl;
+		moveToCoordinates(apPosition);
+	} else {
+		//TODO: Throw error
+		std::cout << "[void TicTacToe::moveToPosition(std::string positionKey)]";
+		std::cout << " ERROR - Invalid position reference: " << positionKey;
+		std::cout << std::endl;
+	}
 }
 
 void TicTacToe::pickAndPlace(int targetPosition) {
