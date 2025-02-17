@@ -6,6 +6,7 @@
   <description>TicTacToe Node for Arctos robot arm Pincer</description>
   <maintainer email="pervigilent@gmail.com">StewartNash</maintainer>
   <license>MIT</license>
+  <url type="website">https://github.com/StewartNash/pincer-games</url>  
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 

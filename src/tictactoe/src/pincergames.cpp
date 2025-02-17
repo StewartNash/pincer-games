@@ -55,8 +55,7 @@ TicTacToe::TicTacToe() : rclcpp::Node("tic_tac_toe_robot"), count_(0) {
 	commandPublisher_ = this->create_publisher<std_msgs::msg::String>("ui_command", 10);
 	////timer_ = this->create_wall_timer(500ms, std::bind(&TicTacToe::timer_callback, this));
 	//timer_ = this->create_wall_timer(std::literals::chrono_literals::operator""ms(500), std::bind(&TicTacToe::timer_callback, this));
-	//subscription_ = this->create_subscription<std_msgs::msg::String>("/darknet_ros/bounding_boxes", darknet_emulator::msg::BoundingBoxes, boundingBoxesCallback, 1);
-	boundingBoxesSubscriber_ = this->create_subscription<darknet_emulator::msg::BoundingBoxes>("darknet_emulator/bounding_boxes", 1,  std::bind(&TicTacToe::boundingBoxesCallback, this, std::placeholders::_1));
+	boundingBoxesSubscriber_ = this->create_subscription<darknet_emulator_msgs::msg::BoundingBoxes>("darknet_emulator_msgs/bounding_boxes", 1,  std::bind(&TicTacToe::boundingBoxesCallback, this, std::placeholders::_1));
 }
 
 TicTacToe::~TicTacToe() {
@@ -159,7 +158,7 @@ int TicTacToe::findBestMove() {
 	return -1;
 }
 
-void TicTacToe::boundingBoxesCallback(const darknet_emulator::msg::BoundingBoxes data) const {
+void TicTacToe::boundingBoxesCallback(const darknet_emulator_msgs::msg::BoundingBoxes data) const {
 	char currentBoard[BOARD_POSITIONS];
 	
 	// Process all detected symbols and update the board state
@@ -170,7 +169,7 @@ void TicTacToe::boundingBoxesCallback(const darknet_emulator::msg::BoundingBoxes
 	std::strcpy(currentBoard, committedMoves);
 
 	// Process all detected boxes
-	for (darknet_emulator::msg::BoundingBox obj : data.bounding_boxes) {
+	for (darknet_emulator_msgs::msg::BoundingBox obj : data.bounding_boxes) {
 	
 	}
 	
@@ -185,7 +184,7 @@ void TicTacToe::clearTerminal() {
 	std::cout << "\033[2J\033[1;1H";
 }
 
-int TicTacToe::mapBoundingBoxToGrid(darknet_emulator::msg::BoundingBox box) {
+int TicTacToe::mapBoundingBoxToGrid(darknet_emulator_msgs::msg::BoundingBox box) {
 	double boxXCenter, boxYCenter;
 	double leftBoundary, rightBoundary, topBoundary, bottomBoundary;
 	double xPos, yPos;;

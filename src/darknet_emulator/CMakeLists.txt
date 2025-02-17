@@ -10,19 +10,30 @@ find_package(ament_cmake REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
-find_package(action_msgs REQUIRED)
-find_package(builtin_interfaces REQUIRED)
-find_package(geometry_msgs REQUIRED)
-find_package(rosidl_default_generators REQUIRED)
-find_package(sensor_msgs REQUIRED)
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+#find_package(rclcpp_action REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(darknet_emulator_msgs REQUIRED)
+#find_package(ament_index_cpp REQUIRED)
 
-rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/BoundingBox.msg"
-  "msg/BoundingBoxes.msg"
-  "msg/ObjectCount.msg"
-  "action/CheckForObjects.action"
-  DEPENDENCIES builtin_interfaces action_msgs geometry_msgs sensor_msgs std_msgs
+include_directories(
+  include
+)
+
+add_executable(detector_node src/yolo_object_detector_node.cpp src/YoloObjectDetector.cpp)
+#ament_target_dependencies(detector_node rclcpp rclcpp_action)
+ament_target_dependencies(detector_node rclcpp darknet_emulator_msgs)
+
+install(
+  DIRECTORY include/darknet_emulator/
+  DESTINATION include/darknet_emulator
+)
+
+install(
+  TARGETS detector_node
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 if(BUILD_TESTING)
@@ -36,5 +47,7 @@ if(BUILD_TESTING)
   set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
+
+ament_export_include_directories(include)
 
 ament_package()

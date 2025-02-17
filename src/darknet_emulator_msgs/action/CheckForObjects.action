@@ -7,7 +7,7 @@ sensor_msgs/Image image
 ---
 # Result definition
 int16 id
-darknet_emulator/BoundingBoxes bounding_boxes
+darknet_emulator_msgs/BoundingBoxes bounding_boxes
 
 ---
 # Feedback definition

@@ -16,10 +16,8 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
-//#include "darknet_ros/msg/BoundingBoxes.hpp"
-//#include "darknet_emulator/msg/BoundingBoxes.hpp"
-#include "darknet_emulator/msg/bounding_boxes.hpp"
-#include "darknet_emulator/msg/bounding_box.hpp"
+#include "darknet_emulator_msgs/msg/bounding_boxes.hpp"
+#include "darknet_emulator_msgs/msg/bounding_box.hpp"
 
 namespace pincergames {
 
@@ -71,7 +69,7 @@ class TicTacToe : public rclcpp::Node {
 		//void timer_callback();
 		//rclcpp::TimerBase::SharedPtr timer_;
 		rclcpp::Publisher<std_msgs::msg::String>::SharedPtr commandPublisher_;
-		rclcpp::Subscription<darknet_emulator::msg::BoundingBoxes>::SharedPtr boundingBoxesSubscriber_;
+		rclcpp::Subscription<darknet_emulator_msgs::msg::BoundingBoxes>::SharedPtr boundingBoxesSubscriber_;
 		size_t count_;
 		
 		std::thread inputThread; // Create keyboard input thread for reset
@@ -80,9 +78,9 @@ class TicTacToe : public rclcpp::Node {
 		void handleKeyboardInput();
 		void resetGame();
 		int findBestMove();
-		void boundingBoxesCallback(const darknet_emulator::msg::BoundingBoxes data) const;
+		void boundingBoxesCallback(const darknet_emulator_msgs::msg::BoundingBoxes data) const;
 		void clearTerminal();
-		int mapBoundingBoxToGrid(darknet_emulator::msg::BoundingBox box);
+		int mapBoundingBoxToGrid(darknet_emulator_msgs::msg::BoundingBox box);
 		bool checkWinner();
 		void displayBoard();
 		void moveToPosition(std::string positionKey);
