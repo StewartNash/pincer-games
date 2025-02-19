@@ -158,8 +158,11 @@ int TicTacToe::findBestMove() {
 	return -1;
 }
 
-void TicTacToe::boundingBoxesCallback(const darknet_emulator_msgs::msg::BoundingBoxes data) const {
+void TicTacToe::boundingBoxesCallback(const darknet_emulator_msgs::msg::BoundingBoxes data) {
 	char currentBoard[BOARD_POSITIONS];
+	int moveIndex;
+	std::vector<int> newOMoves;
+	int bestMove;
 	
 	// Process all detected symbols and update the board state
 	if (!gameActive || !waitingForHuman) {
@@ -169,15 +172,92 @@ void TicTacToe::boundingBoxesCallback(const darknet_emulator_msgs::msg::Bounding
 	std::strcpy(currentBoard, committedMoves);
 
 	// Process all detected boxes
-	for (darknet_emulator_msgs::msg::BoundingBox obj : data.bounding_boxes) {
-	
+	for (darknet_emulator_msgs::msg::BoundingBox box : data.bounding_boxes) {
+		moveIndex = mapBoundingBoxToGrid(box);
+		if (moveIndex >=0) { // Only process moves within boundaries
+			if (box.class_id == "oxx" && committedMoves[moveIndex] == '\0') {
+				currentBoard[moveIndex] = 'O';
+			} else if (box.class_id == "ixx") {
+				// For X moves, only show them if they're committedMOves
+				if (committedMoves[moveIndex] == 'X') {
+					currentBoard[moveIndex] = 'X';
+				}
+			}
+		}
 	}
 	
 	// Check if new valid O move has been made
 	if (!std::strcmp(currentBoard, lastDetectedBoard)) {
-
+		for (int i = 0; i < BOARD_POSITIONS; i++) {
+			if (currentBoard[i] == 'O' && committedMoves[i] == '\0') {
+				newOMoves.push_back(i);
+			}
+		}
+		if (newOMoves.size() == 1) { // Exactly one new O move
+			moveIndex = newOMoves[0];
+			committedMoves[moveIndex] = 'O'; // Commit the move
+			std::strcpy(boardState, committedMoves);
+			std::strcpy(lastDetectedBoard, boardState);
+			waitingForHuman = false;
+			
+			clearTerminal();
+			displayBoard();
+			
+			if (checkWinner()) {
+				std::cout << "\nHuman wins!" << std::endl;
+				//TODO: display HUMAN_WINS
+				gameActive = false;
+				return;
+			}
+			
+			// Make robot's move
+			bestMove = findBestMove();
+			if (bestMove >= 0) {
+				committedMoves[bestMove] = 'X'; // Commit the robot's move
+				std::strcpy(boardState, committedMoves);
+				pickAndPlace(bestMove);
+				currentFigure += 1;
+				
+				clearTerminal();
+				displayBoard();
+			}
+			
+			if (checkWinner()) {
+				std::cout << "\nRobot wins!" << std::endl;
+				std::cout << ROBOT_WINS << std::endl;
+				gameActive = false;
+				return;
+			} else { //TODO: Use lambda expression?
+				bool isFull = true;
+				for (int i = 0; i < BOARD_POSITIONS; i++) {
+					if (committedMoves[i] == '\0') {
+						isFull = false;
+					}
+				}
+				if (isFull) {
+					std::cout << "\nGameOver - It\'s a tie!" << std::endl;
+					std::cout << TIE_GAME << std::endl;
+					return;
+			      	}
+			}
+			
+			waitingForHuman = true;
+			displayBoard();
+		}
 	}
 	return;
+}
+
+std::array<double, 3> TicTacToe::applyJointOffsets(std::array<double, 3> coords) {
+	// Modified to handle complete joint state
+	// Returns the complete position tuple structure
+	return coords; // Since we're using full joint states, we don't need to modify them
+}
+
+std::array<std::array<double, 3>, 2> TicTacToe::applyJointOffsets(std::array<std::array<double, 3>, 2> coords) {
+	// Modified to handle complete joint state
+	// Returns the complete position tuple structure
+	return coords; // Since we're using full joint states, we don't need to modify them
 }
 
 void TicTacToe::clearTerminal() {

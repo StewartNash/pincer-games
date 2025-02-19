@@ -78,7 +78,11 @@ class TicTacToe : public rclcpp::Node {
 		void handleKeyboardInput();
 		void resetGame();
 		int findBestMove();
-		void boundingBoxesCallback(const darknet_emulator_msgs::msg::BoundingBoxes data) const;
+		void boundingBoxesCallback(const darknet_emulator_msgs::msg::BoundingBoxes data);
+		//double* applyJointOffsets(double coords[3]);
+		//double** applyJointOffsets(double coords[3][2]);
+		std::array<double, 3> applyJointOffsets(std::array<double, 3> coords);
+		std::array<std::array<double, 3>, 2> applyJointOffsets(std::array<std::array<double, 3>, 2> coords);
 		void clearTerminal();
 		int mapBoundingBoxToGrid(darknet_emulator_msgs::msg::BoundingBox box);
 		bool checkWinner();
