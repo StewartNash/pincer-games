@@ -17,7 +17,15 @@
 #include "darknet_emulator_msgs/msg/bounding_boxes.hpp"
 #include "darknet_emulator_msgs/msg/bounding_box.hpp"
 
+#include "darknet_emulator/YoloEmulator.hpp"
+
 namespace darknet_emulator {
+
+// Bounding box of the detected object.
+typedef struct {
+	float x, y, w, h, prob;
+	int num, Class;
+} RosBox_;
 
 class YoloObjectDetector : public rclcpp::Node {
 	public:
@@ -30,6 +38,17 @@ class YoloObjectDetector : public rclcpp::Node {
 		rclcpp::Publisher<darknet_emulator_msgs::msg::BoundingBoxes>::SharedPtr boundingBoxesPublisher_;
 		
 		darknet_emulator_msgs::msg::BoundingBoxes boundingBoxesResults_;
+		int demoClasses_;
+		RosBox_ *roiBoxes_;
+		network *net_;
+		
+		void *detectInThread();
+		void *detectLoop(void *ptr);
+		void setupNetwork();
+		void yolo();
+		void *publishInThread();
+		
+		YoloEmulator myYoloEmulator = YoloEmulator();
 };
 
-}
+} /* namespace darknet_emulator */

@@ -22,7 +22,7 @@ include_directories(
   include
 )
 
-add_executable(detector_node src/yolo_object_detector_node.cpp src/YoloObjectDetector.cpp)
+add_executable(detector_node src/yolo_object_detector_node.cpp src/YoloObjectDetector.cpp src/YoloEmulator.cpp)
 #ament_target_dependencies(detector_node rclcpp rclcpp_action)
 ament_target_dependencies(detector_node rclcpp darknet_emulator_msgs)
 
