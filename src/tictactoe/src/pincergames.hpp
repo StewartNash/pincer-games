@@ -97,4 +97,4 @@ class TicTacToe : public rclcpp::Node {
 		void updateDisplay(std::string status);
 };
 
-}
+} /* namespace pincergames */
