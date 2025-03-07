@@ -14,12 +14,22 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(darknet_emulator_msgs REQUIRED)
 
-add_executable(main_node src/pincergames_node.cpp src/pincergames.cpp)
-ament_target_dependencies(main_node rclcpp std_msgs darknet_emulator_msgs)
+include_directories(
+  include
+)
 
-install(TARGETS
-  main_node 
-  DESTINATION lib/${PROJECT_NAME})
+add_executable(tictactoe_node src/tictac_node.cpp src/tictac.cpp)
+ament_target_dependencies(tictactoe_node rclcpp std_msgs darknet_emulator_msgs)
+
+install(
+  DIRECTORY include/tictactoe/
+  DESTINATION include/tictactoe
+)
+
+install(
+  TARGETS tictactoe_node 
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -32,5 +42,7 @@ if(BUILD_TESTING)
   set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
+
+ament_export_include_directories(include)
 
 ament_package()

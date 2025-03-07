@@ -1,4 +1,4 @@
-#include "pincergames.hpp"
+#include "tictactoe/tictac.hpp"
 
 using namespace pincergames;
 //using namespace std::chrono_literals
