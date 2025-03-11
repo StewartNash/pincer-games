@@ -47,64 +47,15 @@ std::map<int, std::tuple<int, int>> YoloEmulator::arrayLocations = {
 	{9, {2, 2}}
 };
 
-YoloEmulator::YoloEmulator() : rclcpp::Node("yolo_emulator"), count_(0) {
+YoloEmulator::YoloEmulator() :
+  rclcpp::Node("yolo_emulator"),
+  count_(0),
+  generator(std::random_device{}()),
+  humanTimeDistribution(averageHumanMoveTime, humanMoveTimeStdDev),
+  robotTimeDistribution(averageRobotMoveTime, robotMoveTimeStdDev) {
 	subscription_ = this->create_subscription<std_msgs::msg::String>("ui_command", 10, std::bind(&YoloEmulator::callback, this, std::placeholders::_1));
-/*
-	////centerPositions[1] = std::make_tuple(-1.310, 1.197, -0.764);
-	////centerPositions[2] = std::make_tuple(-1.096, 1.183, -0.716);
-	////centerPositions[3] = std::make_tuple(-0.916, 1.171, -0.607);
-	////centerPositions[4] = std::make_tuple(-0.766, 1.173, -0.431);
-	////centerPositions[5] = std::make_tuple(-0.668, 1.199, -0.274);
-	//centerPositions[1] = std::make_tuple(-0.888, 1.247, -0.016);
-	//centerPositions[2] = std::make_tuple(-1.004, 1.373, 0.363);
-	//centerPositions[3] = std::make_tuple(-1.080, 1.595, 0.925);
-	//centerPositions[4] = std::make_tuple(-1.087, 1.193, -0.234);
-	//centerPositions[5] = std::make_tuple(-1.164, 1.289, 0.169);
-	//centerPositions[6] = std::make_tuple(-1.221, 1.471, 0.639);
-	//centerPositions[7] = std::make_tuple(-1.314, 1.176, -0.339);
-	//centerPositions[8] = std::make_tuple(-1.370, 1.258, 0.045);
-	//centerPositions[9] = std::make_tuple(-1.387, 1.429, 0.520);
-	
-	//centerPositions[1] = std::make_tuple(-0.888, 1.247);
-	//centerPositions[2] = std::make_tuple(-1.004, 1.373);
-	//centerPositions[3] = std::make_tuple(-1.080, 1.595);
-	//centerPositions[4] = std::make_tuple(-1.087, 1.193);
-	//centerPositions[5] = std::make_tuple(-1.164, 1.289);
-	//centerPositions[6] = std::make_tuple(-1.221, 1.471);
-	//centerPositions[7] = std::make_tuple(-1.314, 1.176);
-	//centerPositions[8] = std::make_tuple(-1.370, 1.258);
-	//centerPositions[9] = std::make_tuple(-1.387, 1.429);
-	
-	centerPositions[1] = std::make_tuple(-0.99, 1.21);
-	centerPositions[2] = std::make_tuple(-0.99, 1.37);
-	centerPositions[3] = std::make_tuple(-0.99, 1.54);
-	centerPositions[4] = std::make_tuple(-1.20, 1.21);
-	centerPositions[5] = std::make_tuple(-1.20, 1.37);
-	centerPositions[6] = std::make_tuple(-1.20, 1.54);
-	centerPositions[7] = std::make_tuple(-1.42, 1.21);
-	centerPositions[8] = std::make_tuple(-1.42, 1.37);
-	centerPositions[9] = std::make_tuple(-1.42, 1.54);
-	
-	centerPixels[1] = std::make_tuple(297, 127);
-	centerPixels[2] = std::make_tuple(297, 228);
-	centerPixels[3] = std::make_tuple(297, 330);
-	centerPixels[4] = std::make_tuple(398, 127);
-	centerPixels[5] = std::make_tuple(398, 228);
-	centerPixels[6] = std::make_tuple(398, 330);
-	centerPixels[7] = std::make_tuple(498, 127);
-	centerPixels[8] = std::make_tuple(498, 228);
-	centerPixels[9] = std::make_tuple(498, 330);
-	
-	arrayLocations[1] = std::make_tuple(0, 0);
-	arrayLocations[2] = std::make_tuple(0, 1);
-	arrayLocations[3] = std::make_tuple(0, 2);
-	arrayLocations[4] = std::make_tuple(1, 0);
-	arrayLocations[5] = std::make_tuple(1, 1);
-	arrayLocations[6] = std::make_tuple(1, 2);
-	arrayLocations[7] = std::make_tuple(2, 0);
-	arrayLocations[8] = std::make_tuple(2, 1);
-	arrayLocations[9] = std::make_tuple(2, 2);
-*/
+	robotMoveTime = robotTimeDistribution(generator);
+	humanMoveTime = humanTimeDistribution(generator);
 }
 
 YoloEmulator::~YoloEmulator() {
@@ -158,6 +109,9 @@ void YoloEmulator::receiveMove(double xPosition, double yPosition) {
 	int location;
 	
 	location = convertToLocation(convertToPixels(xPosition, yPosition));
+	
+	sleep(robotMoveTime);
+	robotMoveTime = robotTimeDistribution(generator);
 	populateBoard(location, ROBOT_CHARACTER);
 }
 

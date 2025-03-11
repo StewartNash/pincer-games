@@ -12,6 +12,8 @@
 #include <string>
 #include <map>
 #include <tuple>
+#include <random>
+#include <unistd.h>
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
@@ -74,13 +76,24 @@ class YoloEmulator : public rclcpp::Node {
 		rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_;
 		size_t count_;
 
-		//std::map<int, std::tuple<double, double, double>> centerPositions;
 		static std::map<int, std::tuple<double, double>> centerPositions;
 		static std::map<int, std::tuple<int, int>> centerPixels;
 		static std::map<int, std::tuple<int, int>> arrayLocations;
 		
-		double averageXMoveTime = 30.0 * 1E3;
-		double averageOMoveTime = 30.0 * 1E3;
+		std::mt19937 generator;
+		std::normal_distribution<double> robotTimeDistribution;
+		std::normal_distribution<double> humanTimeDistribution;
+		
+		//double averageXMoveTime = 30.0; // seconds
+		//double averageOMoveTime = 30.0; // seconds
+		//double xMoveTimeStdDev = 7.5; // seconds
+		//double yMoveTimeStdDev = 7.4; // seconds
+		double averageHumanMoveTime = 30.0; // seconds
+		double averageRobotMoveTime = 30.0; // seconds
+		double humanMoveTimeStdDev = 7.5; // seconds
+		double robotMoveTimeStdDev = 7.5; // seconds
+		double robotMoveTime;
+		double humanMoveTime;
 		double currentTime;
 		char boardState[3][3];
 		double boardXPositions[3][3];
