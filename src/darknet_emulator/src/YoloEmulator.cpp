@@ -93,8 +93,78 @@ network *YoloEmulator::load_network() {
 	return nullptr;
 }
 
-void YoloEmulator::makeMove() {
+bool YoloEmulator::checkEndGame() {
+	char currentBoard[BOARD_SIZE];
+	
+	for (int i = 0; i < X_SIZE; i++) {
+		for (int j = 0; j < Y_SIZE; j++) {
+			currentBoard[i * Y_SIZE + j] = boardState[j][i];
+		}
+	}
+			
+	// Check for a winner in any direction
+	std::vector<std::tuple<int, int, int>> winConditions = {
+		{0, 1, 2}, {3, 4, 5}, {6, 7, 8}, // Rows
+		{0, 3, 6}, {1, 4, 7}, {2, 5, 8}, // Columns
+		{0, 4, 8}, {2, 4, 6} // Diagonals
+	};
 
+	for (const auto& condition : winConditions) {
+		int a = std::get<0>(condition);
+		int b = std::get<1>(condition);
+		int c = std::get<2>(condition);
+
+		if (currentBoard[a] == currentBoard[b] &&
+			currentBoard[b] == currentBoard[c] &&
+			currentBoard[c] != '\0') {
+			return true;
+		}
+	}
+	
+	bool isFull = true;
+	for (int i = 0; i < BOARD_SIZE; i++) {
+		if (currentBoard[i] == '\0') {
+			isFull = false;
+		}
+	}
+	
+	if (isFull) {
+		return true;
+	}
+	
+	return false;
+}
+
+int YoloEmulator::findLocation(std::tuple<int, int> indices) {
+	for (const auto& pair : arrayLocations) {
+		if (pair.second == indices) {
+			return pair.first;
+			//break;
+		}
+	}
+	
+	return -1;
+}
+
+void YoloEmulator::makeMove() {
+	int location;
+
+	if (!checkEndGame()) {
+		sleep(humanMoveTime);
+		humanMoveTime = humanTimeDistribution(generator);
+		//TODO: Make random human move
+		for (int i = 0; i < X_SIZE; i++) {
+			for (int j = 0; j < Y_SIZE; j++) {
+				if (boardState[j][i] == '\0') {
+					location = findLocation(std::make_tuple(i, j));
+					break;
+				}
+			}
+		}
+		populateBoard(location, HUMAN_CHARACTER);
+	} else {
+		// Game Over
+	}
 }
 
 void YoloEmulator::populateBoard(int location, char player) {

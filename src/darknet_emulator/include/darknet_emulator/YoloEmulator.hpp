@@ -101,6 +101,8 @@ class YoloEmulator : public rclcpp::Node {
 		bool isXTurn;
 
 		void callback(std_msgs::msg::String command);
+		bool checkEndGame();
+		int findLocation(std::tuple<int, int> indices);
 		void makeMove();
 		void populateBoard(int location, char player);
 		void receiveMove(double xPosition, double yPosition);
