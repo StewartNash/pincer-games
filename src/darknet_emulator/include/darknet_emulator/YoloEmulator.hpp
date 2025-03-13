@@ -69,8 +69,11 @@ class YoloEmulator : public rclcpp::Node {
 		static const char ROBOT_CHARACTER = 'X';
 		static const char HUMAN_CHARACTER = 'O';
 		
-		void draw_detections(detection *dets, int nboxes);
-		void free_detections(detection *dets, int nboxes);
+		static const int X_CLASS = 1;
+		static const int O_CLASS = 0;
+		
+		void draw_detections(detection *dets, int& nboxes);
+		void free_detections(detection *dets, int& nboxes);
 		network *load_network();
 	private:
 		rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_;

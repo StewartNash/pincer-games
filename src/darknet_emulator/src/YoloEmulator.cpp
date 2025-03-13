@@ -81,12 +81,45 @@ void YoloEmulator::callback(std_msgs::msg::String command) {
 	}
 }
 
-void YoloEmulator::draw_detections(detection *dets, int nboxes) {
-	dets = nullptr;
+void YoloEmulator::draw_detections(detection *dets, int& nboxes) { 
+	std::vector<detection> temporary;
+	
+	if (!(dets == nullptr)) {
+		delete[] dets;
+		nboxes = 0;
+	}
+	
+	for (int i = 0; i < X_SIZE; i++) {
+		for (int j = 0; j < Y_SIZE; j++) {
+			if (!(boardState[j][i] == '\0'))  {
+				++nboxes;
+				detection currentDetection;
+				if (boardState[j][i] == 'X') {
+					currentDetection.classes = X_CLASS;
+				} else {
+					currentDetection.classes = O_CLASS;
+				}
+				box currentBox;
+				currentBox.x = 0;
+				currentBox.y = 0;
+				currentBox.w = X_DISTANCE;
+				currentBox.h = Y_DISTANCE;
+				currentDetection.bbox = currentBox;
+				currentDetection.prob = nullptr;
+				currentDetection.mask = nullptr;
+				currentDetection.objectness = 1.0;
+				currentDetection.sort_class = 0;
+			}
+		}
+	}
+				
 }
 
-void YoloEmulator::free_detections(detection *dets, int nboxes) {
-
+void YoloEmulator::free_detections(detection *dets, int& nboxes) {
+	if (!(dets == nullptr)) {
+		delete[] dets;
+		nboxes = 0;
+	}
 }
 
 network *YoloEmulator::load_network() {
