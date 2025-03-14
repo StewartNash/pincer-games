@@ -16,7 +16,7 @@ YoloObjectDetector::YoloObjectDetector() : Node("darknet_emulator") {
 }
 
 YoloObjectDetector::~YoloObjectDetector() {
-
+	delete[] roiBoxes_;
 }
 
 void YoloObjectDetector::init() {
@@ -33,6 +33,11 @@ void YoloObjectDetector::init() {
 		bounding_boxes_publisher_qos.transient_local();
 	}
 	boundingBoxesPublisher_ = this->create_publisher<darknet_emulator_msgs::msg::BoundingBoxes>(boundingBoxesTopicName, bounding_boxes_publisher_qos);
+	timer_ = this->create_wall_timer(std::literals::chrono_literals::operator""ms(500), std::bind(&YoloObjectDetector::timerCallback, this));
+}
+
+void YoloObjectDetector::timerCallback() {
+
 }
 
 void *YoloObjectDetector::detectInThread() {
@@ -42,7 +47,10 @@ void *YoloObjectDetector::detectInThread() {
 	dets = nullptr;
 	nboxes = 0;
 
-	myYoloEmulator.draw_detections(dets, nboxes);
+	myYoloEmulator.draw_detections(dets, nboxes, demoClasses_);
+	if (nboxes * demoClasses_ > MAXIMUM_BOXES) {
+		throw "Maximum box count exceeded.";
+	}
 	// extract the bounding boxes and send them to ROS
 	int i, j;
 	int count = 0;
@@ -106,7 +114,7 @@ void YoloObjectDetector::setupNetwork() {
 }
 
 void YoloObjectDetector::yolo() {
-
+	roiBoxes_ = new RosBox_[MAXIMUM_BOXES];
 }
 
 void *YoloObjectDetector::publishInThread() {

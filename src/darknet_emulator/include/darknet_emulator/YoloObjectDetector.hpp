@@ -8,8 +8,8 @@
  */
 #pragma once
 
-//#include <chrono>
-//#include <functional>
+#include <chrono>
+#include <functional>
 
 #include "rclcpp/rclcpp.hpp"
 //#include "rclcpp_action/rclcpp_action.hpp"
@@ -28,13 +28,17 @@ typedef struct {
 } RosBox_;
 
 class YoloObjectDetector : public rclcpp::Node {
+	//friend class YoloEmulator;
 	public:
 		explicit YoloObjectDetector();
 		~YoloObjectDetector();
 		void init();
-	private:
-		bool readParameters();
 		
+		static const int MAXIMUM_BOXES = 512;
+	private:
+		void timerCallback();
+		bool readParameters();
+		rclcpp::TimerBase::SharedPtr timer_;		
 		rclcpp::Publisher<darknet_emulator_msgs::msg::BoundingBoxes>::SharedPtr boundingBoxesPublisher_;
 		
 		darknet_emulator_msgs::msg::BoundingBoxes boundingBoxesResults_;

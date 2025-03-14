@@ -34,7 +34,8 @@ std::map<int, std::tuple<int, int>> YoloEmulator::centerPixels = {
 	{8, {498, 228}},
 	{9, {498, 330}}
 };
-	
+
+//TODO: Review rows, columns, and indices to ensure correctness
 std::map<int, std::tuple<int, int>> YoloEmulator::arrayLocations = {
 	{1, {0, 0}},
 	{2, {0, 1}},
@@ -56,10 +57,40 @@ YoloEmulator::YoloEmulator() :
 	subscription_ = this->create_subscription<std_msgs::msg::String>("ui_command", 10, std::bind(&YoloEmulator::callback, this, std::placeholders::_1));
 	robotMoveTime = robotTimeDistribution(generator);
 	humanMoveTime = humanTimeDistribution(generator);
+	isHumanTurn = false;
+	isMoveReceived = false;
+	currentTime = 0;
+	deltaTime = 0;
 }
 
 YoloEmulator::~YoloEmulator() {
 
+}
+
+void YoloEmulator::incrementTime(double increment) {
+	currentTime += increment;
+	deltaTime += increment;
+	
+	if (isHumanTurn) {
+		//sleep(humanMoveTime);
+		if (deltaTime > humanMoveTime) {
+			deltaTime = std::fmod(deltaTime, humanMoveTime);
+			makeMove();
+			isHumanTurn = false;
+			humanMoveTime = humanTimeDistribution(generator);
+		}
+	} else {
+		//sleep(robotMoveTime);
+		if (isMoveReceived) {
+			if (deltaTime > robotMoveTime) {
+				deltaTime = std::fmod(deltaTime, robotMoveTime);
+				populateBoard(robotQueue, ROBOT_CHARACTER);
+				isMoveReceived = false;
+				isHumanTurn = true;
+				robotMoveTime = robotTimeDistribution(generator);
+			}
+		}
+	}
 }
 
 void YoloEmulator::callback(std_msgs::msg::String command) {
@@ -81,43 +112,64 @@ void YoloEmulator::callback(std_msgs::msg::String command) {
 	}
 }
 
-void YoloEmulator::draw_detections(detection *dets, int& nboxes) { 
+void YoloEmulator::draw_detections(detection *dets, int& nboxes, int& classes) {
+	int numberOfBoxes;
 	std::vector<detection> temporary;
 	
-	if (!(dets == nullptr)) {
-		delete[] dets;
-		nboxes = 0;
-	}
-	
+	free_detections(dets, nboxes);
+	numberOfBoxes = 0;
 	for (int i = 0; i < X_SIZE; i++) {
 		for (int j = 0; j < Y_SIZE; j++) {
-			if (!(boardState[j][i] == '\0'))  {
-				++nboxes;
-				detection currentDetection;
-				if (boardState[j][i] == 'X') {
-					currentDetection.classes = X_CLASS;
-				} else {
-					currentDetection.classes = O_CLASS;
-				}
-				box currentBox;
-				currentBox.x = 0;
-				currentBox.y = 0;
-				currentBox.w = X_DISTANCE;
-				currentBox.h = Y_DISTANCE;
-				currentDetection.bbox = currentBox;
-				currentDetection.prob = nullptr;
-				currentDetection.mask = nullptr;
-				currentDetection.objectness = 1.0;
-				currentDetection.sort_class = 0;
+			if (!boardState[j][i] == '\0') {
+				++numberOfBoxes;
 			}
 		}
 	}
-				
+	dets = new detection[numberOfBoxes];
+	nboxes = 0;
+	for (int i = 0; i < X_SIZE; i++) {
+		for (int j = 0; j < Y_SIZE; j++) {
+			if (!(boardState[j][i] == '\0'))  {
+				int location = findLocation(std::make_tuple(j, i));
+				if (boardState[j][i] == 'X') {
+					dets[nboxes].classes = X_CLASS;
+					dets[nboxes].prob = new float[NUMBER_OF_CLASSES];
+					dets[nboxes].prob[X_CLASS] = 1.0;
+					dets[nboxes].prob[O_CLASS] = 0.0;
+					dets[nboxes].mask = new float[NUMBER_OF_CLASSES];
+					dets[nboxes].mask[X_CLASS] = 1.0;
+					dets[nboxes].mask[O_CLASS] = 0.0;					
+				} else {
+					dets[nboxes].classes = O_CLASS;
+					dets[nboxes].classes = X_CLASS;
+					dets[nboxes].prob = new float[NUMBER_OF_CLASSES];
+					dets[nboxes].prob[X_CLASS] = 0.0;
+					dets[nboxes].prob[O_CLASS] = 1.0;
+					dets[nboxes].mask = new float[NUMBER_OF_CLASSES];
+					dets[nboxes].mask[X_CLASS] = 0.0;
+					dets[nboxes].mask[O_CLASS] = 1.0;
+				}
+				dets[nboxes].bbox.x = std::get<0>(centerPositions[location]);
+				dets[nboxes].bbox.y = std::get<1>(centerPositions[location]);
+				dets[nboxes].bbox.w = X_DISTANCE;
+				dets[nboxes].bbox.h = Y_DISTANCE;
+				dets[nboxes].objectness = 1.0;
+				dets[nboxes].sort_class = 0;
+				++nboxes;
+			}
+		}
+	}
+	classes = NUMBER_OF_CLASSES;	
 }
 
 void YoloEmulator::free_detections(detection *dets, int& nboxes) {
 	if (!(dets == nullptr)) {
+		for (int i = 0; i < nboxes; i++) {
+			delete[] dets[i].prob;
+			delete[] dets[i].mask;
+		}
 		delete[] dets;
+		dets = nullptr;
 		nboxes = 0;
 	}
 }
@@ -183,8 +235,6 @@ void YoloEmulator::makeMove() {
 	int location;
 
 	if (!checkEndGame()) {
-		sleep(humanMoveTime);
-		humanMoveTime = humanTimeDistribution(generator);
 		//TODO: Make random human move
 		for (int i = 0; i < X_SIZE; i++) {
 			for (int j = 0; j < Y_SIZE; j++) {
@@ -205,17 +255,17 @@ void YoloEmulator::populateBoard(int location, char player) {
 	
 	row = std::get<0>(arrayLocations[location]);
 	column = std::get<1>(arrayLocations[location]);
+	//TODO: Check for conflicts
 	boardState[row][column] = player;
 }
 
 void YoloEmulator::receiveMove(double xPosition, double yPosition) {
-	int location;
-	
-	location = convertToLocation(convertToPixels(xPosition, yPosition));
-	
-	sleep(robotMoveTime);
-	robotMoveTime = robotTimeDistribution(generator);
-	populateBoard(location, ROBOT_CHARACTER);
+	if (!isHumanTurn && !isMoveReceived) {
+		robotQueue = convertToLocation(convertToPixels(xPosition, yPosition));
+		isMoveReceived = true;
+	} else {
+		throw "Multiple and/or out-of-turn robot moves received.";
+	}	
 }
 
 // Static methods
@@ -277,7 +327,7 @@ double YoloEmulator::getDistance(double x, double y) {
 	double distance;
 	
 	distance = (x - y) * (x - y);
-	//TODO: Take square root of distance	
+	distance = std::sqrt(distance);
 	
 	return distance;
 }
@@ -290,7 +340,7 @@ double YoloEmulator::getDistance(double x1, double y1, double x2, double y2) {
 	double distance;
 	
 	distance = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
-	//TODO: Take square root of distance
+	distance = std::sqrt(distance);;;
 	
 	return distance;
 }

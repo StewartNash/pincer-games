@@ -13,7 +13,8 @@
 #include <map>
 #include <tuple>
 #include <random>
-#include <unistd.h>
+//#include <unistd.h>
+#include <cmath>
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
@@ -71,8 +72,10 @@ class YoloEmulator : public rclcpp::Node {
 		
 		static const int X_CLASS = 1;
 		static const int O_CLASS = 0;
+		static const int NUMBER_OF_CLASSES = 2;
 		
-		void draw_detections(detection *dets, int& nboxes);
+		void incrementTime(double increment); // increment in seconds
+		void draw_detections(detection *dets, int& nboxes, int& classes);
 		void free_detections(detection *dets, int& nboxes);
 		network *load_network();
 	private:
@@ -98,10 +101,14 @@ class YoloEmulator : public rclcpp::Node {
 		double robotMoveTime;
 		double humanMoveTime;
 		double currentTime;
+		double deltaTime;
 		char boardState[3][3];
 		double boardXPositions[3][3];
 		double boardYPositions[3][3];
-		bool isXTurn;
+		//bool isXTurn;
+		bool isHumanTurn;
+		bool isMoveReceived; // Robot move
+		int robotQueue;
 
 		void callback(std_msgs::msg::String command);
 		bool checkEndGame();
