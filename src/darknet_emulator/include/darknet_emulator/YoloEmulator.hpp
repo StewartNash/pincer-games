@@ -15,6 +15,7 @@
 #include <random>
 //#include <unistd.h>
 #include <cmath>
+#include <iostream>
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
@@ -78,8 +79,8 @@ class YoloEmulator : public rclcpp::Node {
 		static const int NUMBER_OF_CLASSES = 2;
 		
 		void incrementTime(double increment); // increment in seconds
-		void draw_detections(detection *dets, int& nboxes, int& classes);
-		void free_detections(detection *dets, int& nboxes);
+		void draw_detections(detection*& dets, int& nboxes, int& classes);
+		void free_detections(detection*& dets, int& nboxes);
 		network *load_network();
 	private:
 		rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_;

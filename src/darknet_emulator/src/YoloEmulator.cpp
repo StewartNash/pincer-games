@@ -57,7 +57,7 @@ YoloEmulator::YoloEmulator() :
 	subscription_ = this->create_subscription<std_msgs::msg::String>("ui_command", 10, std::bind(&YoloEmulator::callback, this, std::placeholders::_1));
 	robotMoveTime = robotTimeDistribution(generator);
 	humanMoveTime = humanTimeDistribution(generator);
-	isHumanTurn = false;
+	isHumanTurn = true;
 	isMoveReceived = false;
 	currentTime = 0;
 	deltaTime = 0;
@@ -112,7 +112,7 @@ void YoloEmulator::callback(std_msgs::msg::String command) {
 	}
 }
 
-void YoloEmulator::draw_detections(detection *dets, int& nboxes, int& classes) {
+void YoloEmulator::draw_detections(detection*& dets, int& nboxes, int& classes) {
 	int numberOfBoxes;
 	std::vector<detection> temporary;
 	
@@ -141,7 +141,6 @@ void YoloEmulator::draw_detections(detection *dets, int& nboxes, int& classes) {
 					dets[nboxes].mask[O_CLASS] = 0.0;					
 				} else {
 					dets[nboxes].classes = O_CLASS;
-					dets[nboxes].classes = X_CLASS;
 					dets[nboxes].prob = new float[NUMBER_OF_CLASSES];
 					dets[nboxes].prob[X_CLASS] = 0.0;
 					dets[nboxes].prob[O_CLASS] = 1.0;
@@ -162,7 +161,7 @@ void YoloEmulator::draw_detections(detection *dets, int& nboxes, int& classes) {
 	classes = NUMBER_OF_CLASSES;	
 }
 
-void YoloEmulator::free_detections(detection *dets, int& nboxes) {
+void YoloEmulator::free_detections(detection*& dets, int& nboxes) {
 	if (!(dets == nullptr)) {
 		for (int i = 0; i < nboxes; i++) {
 			delete[] dets[i].prob;

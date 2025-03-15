@@ -314,7 +314,7 @@ bool TicTacToe::checkWinner() {
 }
 
 void TicTacToe::displayBoard() {
-	int row[BOARD_SIZE];
+	char row[X_SIZE];
 	int startPosition;
 	int endPosition;
 	int sliceLength;
@@ -322,9 +322,9 @@ void TicTacToe::displayBoard() {
 	// Display the current game board in the terminal
 	clearTerminal();
 	std::cout << "\n╔═══╦═══╦═══╗" << std::endl;
-	for (int i = 0; i  < BOARD_SIZE; i++) {
-		startPosition = i * BOARD_SIZE;
-		endPosition = (i + 1) * BOARD_SIZE;
+	for (int i = 0; i  < Y_SIZE; i++) {
+		startPosition = i * X_SIZE;
+		endPosition = (i + 1) * X_SIZE;
 		sliceLength = endPosition - startPosition;
 		// Assign slice
 		for (int j = 0; j < sliceLength; j++) {
@@ -344,7 +344,7 @@ void TicTacToe::displayBoard() {
 		std::cout << row[2];
 		std::cout << " ║";
 		std::cout << std::endl;
-		if (i < 2) {
+		if (i < Y_SIZE - 1) {
 			std::cout << "╠═══╬═══╬═══╣" << std::endl;
 		}		
 	}

@@ -13,7 +13,9 @@ using namespace darknet_emulator;
 YoloObjectDetector::YoloObjectDetector() : Node("darknet_emulator"), publishTimer(0) {
 	roiBoxes_ = new RosBox_[MAXIMUM_BOXES];
 	frameWidth_ = myYoloEmulator.X_PIXELS;
-	frameHeight_ = myYoloEmulator.Y_PIXELS;	
+	frameHeight_ = myYoloEmulator.Y_PIXELS;
+
+	this->init();
 }
 
 YoloObjectDetector::~YoloObjectDetector() {
@@ -53,13 +55,14 @@ void YoloObjectDetector::init() {
 	numClasses_ = myYoloEmulator.NUMBER_OF_CLASSES;
 	rosBoxes_ = std::vector<std::vector<RosBox_>>(numClasses_);
 	rosBoxCounter_ = std::vector<int>(numClasses_);
-	
-	detectLoop(nullptr);
+
+	//detectLoop(nullptr);
 }
 
 void YoloObjectDetector::timerCallback() {
 	myYoloEmulator.incrementTime(0.5);
-	if (++publishTimer == PUBLISHING_PERIOD) {
+	detectLoop(nullptr);
+	if (++publishTimer == PUBLISHING_PERIOD) {	
 		publishTimer = 0;
 		yolo();
 	}
@@ -126,7 +129,7 @@ void *YoloObjectDetector::detectInThread() {
 	}
 
 	myYoloEmulator.free_detections(dets, nboxes);
-
+	
 	return 0;
 }
 
