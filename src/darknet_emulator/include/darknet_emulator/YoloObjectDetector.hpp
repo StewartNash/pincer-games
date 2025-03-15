@@ -16,6 +16,7 @@
 
 #include "darknet_emulator_msgs/msg/bounding_boxes.hpp"
 #include "darknet_emulator_msgs/msg/bounding_box.hpp"
+#include "darknet_emulator_msgs/msg/object_count.hpp"
 
 #include "darknet_emulator/YoloEmulator.hpp"
 
@@ -35,16 +36,29 @@ class YoloObjectDetector : public rclcpp::Node {
 		void init();
 		
 		static const int MAXIMUM_BOXES = 512;
+		static const int PUBLISHING_PERIOD = 10;
 	private:
+		bool stopDetection = false;
+		bool demoDone_ = false;
+		int publishTimer;
+		
 		void timerCallback();
 		bool readParameters();
-		rclcpp::TimerBase::SharedPtr timer_;		
+		rclcpp::TimerBase::SharedPtr timer_;
+		rclcpp::Publisher<darknet_emulator_msgs::msg::ObjectCount>::SharedPtr objectPublisher_;
 		rclcpp::Publisher<darknet_emulator_msgs::msg::BoundingBoxes>::SharedPtr boundingBoxesPublisher_;
 		
+		int numClasses_;
+		std::vector<std::string> classLabels_;
+		
 		darknet_emulator_msgs::msg::BoundingBoxes boundingBoxesResults_;
+		std::vector<std::vector<RosBox_>> rosBoxes_;
+		std::vector<int> rosBoxCounter_;
 		int demoClasses_;
 		RosBox_ *roiBoxes_;
-		network *net_;
+		network *net_;		
+		int frameWidth_;
+		int frameHeight_;
 		
 		void *detectInThread();
 		void *detectLoop(void *ptr);

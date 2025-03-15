@@ -47,6 +47,9 @@ class YoloEmulator : public rclcpp::Node {
 		static const int Y_SIZE = 3;
 		static const int BOARD_SIZE = 9;
 		
+		static const int X_PIXELS = 720;
+		static const int Y_PIXELS = 480;
+		
 		// Grid boundaries in pixel coordinates
 		static const int LEFT_BOUNDARY = 197;
 		static const int RIGHT_BOUNDARY = 598;
