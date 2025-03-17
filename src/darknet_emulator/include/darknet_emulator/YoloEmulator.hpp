@@ -62,6 +62,8 @@ class YoloEmulator : public rclcpp::Node {
 		static constexpr double FLOAT_TOP_BOUNDARY = 25.0;
 		static constexpr double FLOAT_BOTTOM_BOUNDARY = 431.0;		
 		
+		static constexpr double X_DISTANCE_PIXELS = 100.25;
+		static constexpr double Y_DISTANCE_PIXELS = 101.5;
 		//static constexpr double MEAN_X_SEPARATION = 0.01;
 		//static constexpr double MEAN_Y_SEPARATION = 0.01;
 		static constexpr double X_DISTANCE = 0.213;

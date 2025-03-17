@@ -148,10 +148,10 @@ void YoloEmulator::draw_detections(detection*& dets, int& nboxes, int& classes) 
 					dets[nboxes].mask[X_CLASS] = 0.0;
 					dets[nboxes].mask[O_CLASS] = 1.0;
 				}
-				dets[nboxes].bbox.x = std::get<0>(centerPositions[location]);
-				dets[nboxes].bbox.y = std::get<1>(centerPositions[location]);
-				dets[nboxes].bbox.w = X_DISTANCE;
-				dets[nboxes].bbox.h = Y_DISTANCE;
+				dets[nboxes].bbox.x = std::get<0>(centerPixels[location]);
+				dets[nboxes].bbox.y = std::get<1>(centerPixels[location]);
+				dets[nboxes].bbox.w = X_DISTANCE_PIXELS;
+				dets[nboxes].bbox.h = Y_DISTANCE_PIXELS;
 				dets[nboxes].objectness = 1.0;
 				dets[nboxes].sort_class = 0;
 				++nboxes;
