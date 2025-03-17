@@ -73,6 +73,9 @@ class YoloEmulator : public rclcpp::Node {
 		static constexpr double X_ORIGIN = -0.99;
 		static constexpr double Y_ORIGIN = 1.21;
 		
+		static constexpr double X_RESOLUTION = X_DISTANCE / X_DISTANCE_PIXELS;
+		static constexpr double Y_RESOLUTION = Y_DISTANCE / Y_DISTANCE_PIXELS;
+		
 		static const char ROBOT_CHARACTER = 'X';
 		static const char HUMAN_CHARACTER = 'O';
 		

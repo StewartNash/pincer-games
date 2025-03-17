@@ -195,10 +195,14 @@ void *YoloObjectDetector::publishInThread() {
 				darknet_emulator_msgs::msg::BoundingBox boundingBox;
 				std::cout << "rosBoxCounter_[i]: " << rosBoxCounter_[i] << std::endl;
 				for (int j = 0; j < rosBoxCounter_[i]; j++) {
-					int xmin = (rosBoxes_[i][j].x - rosBoxes_[i][j].w / 2) * frameWidth_;
-					int ymin = (rosBoxes_[i][j].y - rosBoxes_[i][j].h / 2) * frameHeight_;
-					int xmax = (rosBoxes_[i][j].x + rosBoxes_[i][j].w / 2) * frameWidth_;
-					int ymax = (rosBoxes_[i][j].y + rosBoxes_[i][j].h / 2) * frameHeight_;
+					//int xmin = (rosBoxes_[i][j].x - rosBoxes_[i][j].w / 2) * frameWidth_;
+					//int ymin = (rosBoxes_[i][j].y - rosBoxes_[i][j].h / 2) * frameHeight_;
+					//int xmax = (rosBoxes_[i][j].x + rosBoxes_[i][j].w / 2) * frameWidth_;
+					//int ymax = (rosBoxes_[i][j].y + rosBoxes_[i][j].h / 2) * frameHeight_;
+					int xmin = rosBoxes_[i][j].x - rosBoxes_[i][j].w / 2;
+					int ymin = rosBoxes_[i][j].y - rosBoxes_[i][j].h / 2;
+					int xmax = rosBoxes_[i][j].x + rosBoxes_[i][j].w / 2;
+					int ymax = rosBoxes_[i][j].y + rosBoxes_[i][j].h / 2;
 					boundingBox.class_id = classLabels_[i];
 					boundingBox.id = i;
 					boundingBox.probability = rosBoxes_[i][j].prob;
