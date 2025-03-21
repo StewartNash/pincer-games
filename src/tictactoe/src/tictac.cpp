@@ -55,7 +55,8 @@ TicTacToe::TicTacToe() : rclcpp::Node("tic_tac_toe_robot"), count_(0) {
 	commandPublisher_ = this->create_publisher<std_msgs::msg::String>("ui_command", 10);
 	////timer_ = this->create_wall_timer(500ms, std::bind(&TicTacToe::timer_callback, this));
 	//timer_ = this->create_wall_timer(std::literals::chrono_literals::operator""ms(500), std::bind(&TicTacToe::timer_callback, this));
-	boundingBoxesSubscriber_ = this->create_subscription<darknet_emulator_msgs::msg::BoundingBoxes>("darknet_emulator_msgs/bounding_boxes", 1,  std::bind(&TicTacToe::boundingBoxesCallback, this, std::placeholders::_1));
+	//boundingBoxesSubscriber_ = this->create_subscription<darknet_emulator_msgs::msg::BoundingBoxes>("darknet_emulator_msgs/bounding_boxes", 1,  std::bind(&TicTacToe::boundingBoxesCallback, this, std::placeholders::_1));
+	boundingBoxesSubscriber_ = this->create_subscription<darknet_emulator_msgs::msg::BoundingBoxes>("bounding_boxes", 1,  std::bind(&TicTacToe::boundingBoxesCallback, this, std::placeholders::_1));
 }
 
 TicTacToe::~TicTacToe() {
@@ -164,6 +165,7 @@ void TicTacToe::boundingBoxesCallback(const darknet_emulator_msgs::msg::Bounding
 	std::vector<int> newOMoves;
 	int bestMove;
 	
+	std::cout << "In TicTacToe::boundingBoxesCallback" << std::endl;
 	// Process all detected symbols and update the board state
 	if (!gameActive || !waitingForHuman) {
 		return;

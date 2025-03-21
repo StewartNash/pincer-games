@@ -94,10 +94,10 @@ void *YoloObjectDetector::detectInThread() {
 			xmin = 0;
 		if (ymin < 0)
 			ymin = 0;
-		if (xmax > 1)
-			xmax = 1;
-		if (ymax > 1)
-			ymax = 1;
+		if (xmax > frameWidth_)
+			xmax = frameWidth_;
+		if (ymax > frameHeight_)
+			ymax = frameHeight_;
 
 		if (xmax < xmin) {
 				float temporary = xmin;
@@ -110,7 +110,11 @@ void *YoloObjectDetector::detectInThread() {
 				ymin = ymax;
 				ymax = temporary;
 		}
-
+		std::cout << "xmin: " << xmin << std::endl;
+		std::cout << "ymin: " << ymin << std::endl;
+		std::cout << "xmax: " << xmax << std::endl;
+		std::cout << "ymax: " << ymax << std::endl;
+		
 		// iterate through possible boxes and collect the bounding boxes
 		for (j = 0; j < demoClasses_; ++j) {
 			if (dets[i].prob[j]) {
