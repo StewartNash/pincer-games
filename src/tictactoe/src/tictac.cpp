@@ -165,7 +165,6 @@ void TicTacToe::boundingBoxesCallback(const darknet_emulator_msgs::msg::Bounding
 	std::vector<int> newOMoves;
 	int bestMove;
 	
-	std::cout << "In TicTacToe::boundingBoxesCallback" << std::endl;
 	// Process all detected symbols and update the board state
 	if (!gameActive || !waitingForHuman) {
 		return;

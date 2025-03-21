@@ -11,10 +11,13 @@
 using namespace darknet_emulator;
 
 YoloObjectDetector::YoloObjectDetector() : Node("darknet_emulator"), publishTimer(0) {
+	myYoloEmulator = std::make_shared<YoloEmulator>();
 	roiBoxes_ = new RosBox_[MAXIMUM_BOXES];
-	frameWidth_ = myYoloEmulator.X_PIXELS;
-	frameHeight_ = myYoloEmulator.Y_PIXELS;
-
+	//frameWidth_ = myYoloEmulator.X_PIXELS;
+	//frameHeight_ = myYoloEmulator.Y_PIXELS;
+	frameWidth_ = myYoloEmulator->X_PIXELS;
+	frameHeight_ = myYoloEmulator->Y_PIXELS;
+	
 	this->init();
 }
 
@@ -49,19 +52,29 @@ void YoloObjectDetector::init() {
 	}
 	boundingBoxesPublisher_ = this->create_publisher<darknet_emulator_msgs::msg::BoundingBoxes>(boundingBoxesTopicName, bounding_boxes_publisher_qos);
 	timer_ = this->create_wall_timer(std::literals::chrono_literals::operator""ms(500), std::bind(&YoloObjectDetector::timerCallback, this));
-	//std::string str1(1, myYoloEmulator.HUMAN_CHARACTER);
-	//std::string str2(1, myYoloEmulator.ROBOT_CHARACTER);
+	////std::string str1(1, myYoloEmulator.HUMAN_CHARACTER);
+	////std::string str2(1, myYoloEmulator.ROBOT_CHARACTER);
+	//std::string str1(1, myYoloEmulator->HUMAN_CHARACTER);
+	//std::string str2(1, myYoloEmulator->ROBOT_CHARACTER);
 	//classLabels_ = {str1, str2};
 	classLabels_ = {"oxx", "ixx"};
-	numClasses_ = myYoloEmulator.NUMBER_OF_CLASSES;
+	//numClasses_ = myYoloEmulator.NUMBER_OF_CLASSES;
+	numClasses_ = myYoloEmulator->NUMBER_OF_CLASSES;
 	rosBoxes_ = std::vector<std::vector<RosBox_>>(numClasses_);
 	rosBoxCounter_ = std::vector<int>(numClasses_);
 
 	//detectLoop(nullptr);
 }
 
+/*
+std::shared_ptr<YoloEmulator> getYoloEmulator() {
+	return myYoloEmulator;
+}
+*/
+
 void YoloObjectDetector::timerCallback() {
-	myYoloEmulator.incrementTime(0.5);
+	//myYoloEmulator.incrementTime(0.5);
+	myYoloEmulator->incrementTime(0.5);
 	//detectLoop(nullptr);
 	detectInThread();
 	if (++publishTimer == PUBLISHING_PERIOD) {	
@@ -77,7 +90,8 @@ void *YoloObjectDetector::detectInThread() {
 	dets = nullptr;
 	nboxes = 0;
 
-	myYoloEmulator.draw_detections(dets, nboxes, demoClasses_);
+	//myYoloEmulator.draw_detections(dets, nboxes, demoClasses_);
+	myYoloEmulator->draw_detections(dets, nboxes, demoClasses_);
 	if (nboxes * demoClasses_ > MAXIMUM_BOXES) {
 		throw "Maximum box count exceeded.";
 	}
@@ -110,10 +124,6 @@ void *YoloObjectDetector::detectInThread() {
 				ymin = ymax;
 				ymax = temporary;
 		}
-		std::cout << "xmin: " << xmin << std::endl;
-		std::cout << "ymin: " << ymin << std::endl;
-		std::cout << "xmax: " << xmax << std::endl;
-		std::cout << "ymax: " << ymax << std::endl;
 		
 		// iterate through possible boxes and collect the bounding boxes
 		for (j = 0; j < demoClasses_; ++j) {
@@ -124,10 +134,8 @@ void *YoloObjectDetector::detectInThread() {
 				float BoundingBox_height = ymax - ymin;
 
 				// define bounding box
-				// BoundingBox must be 1% size of frame (3.2x2.4 pixels)
-				std::cout << "BoundingBox_width: " << BoundingBox_width << std::endl;
-				std::cout << "BoundingBox_height: " << BoundingBox_height << std::endl;
-				if (BoundingBox_width > 0.01 && BoundingBox_height > 0.01) {
+				// BoundingBox must be 1% size of frame (7.2 x 4.8 pixels)
+				if (BoundingBox_width > 7.2 && BoundingBox_height > 4.8) {
 					roiBoxes_[count].x = x_center;
 					roiBoxes_[count].y = y_center;
 					roiBoxes_[count].w = BoundingBox_width;
@@ -148,7 +156,8 @@ void *YoloObjectDetector::detectInThread() {
 		roiBoxes_[0].num = count;
 	}
 
-	myYoloEmulator.free_detections(dets, nboxes);
+	//myYoloEmulator.free_detections(dets, nboxes);
+	myYoloEmulator->free_detections(dets, nboxes);
 	
 	return 0;
 }
@@ -162,12 +171,12 @@ void *YoloObjectDetector::detectLoop(void *ptr) {
 }
 
 void YoloObjectDetector::setupNetwork() {
-	net_ = myYoloEmulator.load_network();
+	//net_ = myYoloEmulator.load_network();
+	net_ = myYoloEmulator->load_network();
 }
 
 void YoloObjectDetector::yolo() {
 	//roiBoxes_ = new RosBox_[MAXIMUM_BOXES];
-	std::cout << "yolo" << std::endl;
 	if (!demoDone_) {
 		publishInThread();
 	}
@@ -199,10 +208,6 @@ void *YoloObjectDetector::publishInThread() {
 				darknet_emulator_msgs::msg::BoundingBox boundingBox;
 				std::cout << "rosBoxCounter_[i]: " << rosBoxCounter_[i] << std::endl;
 				for (int j = 0; j < rosBoxCounter_[i]; j++) {
-					//int xmin = (rosBoxes_[i][j].x - rosBoxes_[i][j].w / 2) * frameWidth_;
-					//int ymin = (rosBoxes_[i][j].y - rosBoxes_[i][j].h / 2) * frameHeight_;
-					//int xmax = (rosBoxes_[i][j].x + rosBoxes_[i][j].w / 2) * frameWidth_;
-					//int ymax = (rosBoxes_[i][j].y + rosBoxes_[i][j].h / 2) * frameHeight_;
 					int xmin = rosBoxes_[i][j].x - rosBoxes_[i][j].w / 2;
 					int ymin = rosBoxes_[i][j].y - rosBoxes_[i][j].h / 2;
 					int xmax = rosBoxes_[i][j].x + rosBoxes_[i][j].w / 2;

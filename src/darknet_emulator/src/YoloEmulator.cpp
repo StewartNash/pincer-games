@@ -98,8 +98,14 @@ void YoloEmulator::callback(std_msgs::msg::String command) {
 	std::vector<std::string> partition;
 	double x, y, z;
 
+	std::cout << "Enter YoloEmulator::callback(String)" << std::endl;
 	data = command.data;
 	partition = split(data, ',');
+	
+	for (const auto& datum : partition) {
+		std::cout << datum << std::endl;
+	}
+	/*
 	try {
 		x = std::stod(partition[0]);
 		y = std::stod(partition[1]);
@@ -110,6 +116,8 @@ void YoloEmulator::callback(std_msgs::msg::String command) {
 	} catch (const std::out_of_range& e) {
 		std::cerr << "Error: Out of range - " << e.what() << std::endl;
 	}
+	*/
+	std::cout << "Exit YoloEmulator::callback(String)" << std::endl;
 }
 
 void YoloEmulator::draw_detections(detection*& dets, int& nboxes, int& classes) {

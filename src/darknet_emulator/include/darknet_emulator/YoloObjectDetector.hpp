@@ -35,6 +35,8 @@ class YoloObjectDetector : public rclcpp::Node {
 		explicit YoloObjectDetector();
 		~YoloObjectDetector();
 		void init();
+		//std::shared_ptr<YoloEmulator> getYoloEmulator();
+		std::shared_ptr<YoloEmulator> myYoloEmulator;
 		
 		static const int MAXIMUM_BOXES = 512;
 		static const int PUBLISHING_PERIOD = 10;
@@ -67,7 +69,7 @@ class YoloObjectDetector : public rclcpp::Node {
 		void yolo();
 		void *publishInThread();
 		
-		YoloEmulator myYoloEmulator = YoloEmulator();
+		//YoloEmulator myYoloEmulator = YoloEmulator();
 };
 
 } /* namespace darknet_emulator */
