@@ -39,6 +39,22 @@ typedef struct network {
 
 } network;
 
+class RobotState {
+	public:
+		RobotState();
+		
+		bool isGripperOpen;
+		int gripperOpenCount;
+		int gripperCloseCount;
+		bool isPlacementReady;
+	
+		std::tuple<double, double, double> position;
+		std::tuple<double, double, double> positionQueue;
+		
+		void processCommand(std::string command);
+		//std::tuple<double, double, double> getPlacement();
+};
+
 class YoloEmulator : public rclcpp::Node {
 	public:
 		YoloEmulator();
@@ -87,9 +103,13 @@ class YoloEmulator : public rclcpp::Node {
 		void draw_detections(detection*& dets, int& nboxes, int& classes);
 		void free_detections(detection*& dets, int& nboxes);
 		network *load_network();
+		
+		static std::vector<std::string> split(const std::string& s, char separator);
 	private:
 		rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_;
 		size_t count_;
+		
+		RobotState myRobotState = RobotState();
 
 		static std::map<int, std::tuple<double, double>> centerPositions;
 		static std::map<int, std::tuple<int, int>> centerPixels;
@@ -136,7 +156,6 @@ class YoloEmulator : public rclcpp::Node {
 		static double getDistance(int x1, int y1, int x2, int y2);
 		static double getDistance(std::tuple<int, int> a, std::tuple<int, int> b);
 		//static double getDistance(std::tuple<double, double> a, std::tuple<double, double> b);
-		static std::vector<std::string> split(const std::string& s, char separator);
 };
 
 } /* namespace darknet_emulator */

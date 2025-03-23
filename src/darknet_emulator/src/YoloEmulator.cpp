@@ -11,6 +11,51 @@
 
 using namespace darknet_emulator;
 
+RobotState::RobotState() {
+	isGripperOpen = false;
+	gripperOpenCount = 0;
+	gripperCloseCount = 0;
+	isPlacementReady = false;
+}
+
+void RobotState::processCommand(std::string command) {
+	std::vector<std::string> partition;
+	std::string token;
+	double x, y, z;
+	
+	partition = YoloEmulator::split(command, ',');
+	token = partition[0];
+	if (token == "open_gripper") {
+		isGripperOpen = true;
+		++gripperOpenCount;
+	} else if (token == "go_to_joint_state") {
+		try {
+			x = std::stod(partition[1]);
+			y = std::stod(partition[2]);
+			z = std::stod(partition[3]);
+		} catch (const std::invalid_argument& e) {
+			std::cerr << "Error: Invalid argument - " << e.what() << std::endl;
+		} catch (const std::out_of_range& e) {
+			std::cerr << "Error: Out of range - " << e.what() << std::endl;
+		}
+		if (isGripperOpen && gripperOpenCount == 2 * gripperCloseCount) {
+			position = std::make_tuple(x, y, z);
+			isPlacementReady = true;			
+		} else {
+			positionQueue = std::make_tuple(x, y, z);
+		}	
+	} else if (token == "close_gripper") {
+		isGripperOpen = false;
+		++gripperCloseCount;
+	} else {
+	
+	}	
+	for (const auto& datum : partition) {
+		std::cout << datum << std::endl;
+		
+	}
+}
+
 std::map<int, std::tuple<double, double>> YoloEmulator::centerPositions = {
         {1, {-0.99, 1.21}},
 	{2, {-0.99, 1.37}},
@@ -54,7 +99,7 @@ YoloEmulator::YoloEmulator() :
   generator(std::random_device{}()),
   humanTimeDistribution(averageHumanMoveTime, humanMoveTimeStdDev),
   robotTimeDistribution(averageRobotMoveTime, robotMoveTimeStdDev) {
-	subscription_ = this->create_subscription<std_msgs::msg::String>("ui_command", 10, std::bind(&YoloEmulator::callback, this, std::placeholders::_1));
+	subscription_ = this->create_subscription<std_msgs::msg::String>("ui_command", 5, std::bind(&YoloEmulator::callback, this, std::placeholders::_1));
 	robotMoveTime = robotTimeDistribution(generator);
 	humanMoveTime = humanTimeDistribution(generator);
 	isHumanTurn = true;
@@ -98,26 +143,16 @@ void YoloEmulator::callback(std_msgs::msg::String command) {
 	std::vector<std::string> partition;
 	double x, y, z;
 
-	std::cout << "Enter YoloEmulator::callback(String)" << std::endl;
 	data = command.data;
-	partition = split(data, ',');
-	
-	for (const auto& datum : partition) {
-		std::cout << datum << std::endl;
-	}
-	/*
-	try {
-		x = std::stod(partition[0]);
-		y = std::stod(partition[1]);
-		z = std::stod(partition[2]);
+	myRobotState.processCommand(data);
+	if (myRobotState.isPlacementReady) {
+		//std::<double, double> temporary = myRobotState.getPlacement();
+		x = std::get<0>(myRobotState.position);
+		y = std::get<1>(myRobotState.position);
+		z = std::get<2>(myRobotState.position);
 		receiveMove(x, y);
-	} catch (const std::invalid_argument& e) {
-		std::cerr << "Error: Invalid argument - " << e.what() << std::endl;
-	} catch (const std::out_of_range& e) {
-		std::cerr << "Error: Out of range - " << e.what() << std::endl;
+		myRobotState.isPlacementReady = false;
 	}
-	*/
-	std::cout << "Exit YoloEmulator::callback(String)" << std::endl;
 }
 
 void YoloEmulator::draw_detections(detection*& dets, int& nboxes, int& classes) {
@@ -241,6 +276,7 @@ int YoloEmulator::findLocation(std::tuple<int, int> indices) {
 void YoloEmulator::makeMove() {
 	int location;
 
+	std::cout << "Making move." << std::endl;
 	if (!checkEndGame()) {
 		//TODO: Make random human move
 		for (int i = 0; i < X_SIZE; i++) {

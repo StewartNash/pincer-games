@@ -183,10 +183,8 @@ void YoloObjectDetector::yolo() {
 }
 
 void *YoloObjectDetector::publishInThread() {
-	std::cout << "Publishing." << std::endl;
-	
 	int num = roiBoxes_[0].num;
-	std::cout << "roiBoxes_[0].num: " << roiBoxes_[0].num << std::endl;
+
 	if (num > 0 && num <= 100) {
 		for (int i = 0; i < num; i++) {
 			for (int j = 0; j < numClasses_; j++) {
@@ -206,7 +204,6 @@ void *YoloObjectDetector::publishInThread() {
 		for (int i = 0; i < numClasses_; i++) {
 			if (rosBoxCounter_[i] > 0) {
 				darknet_emulator_msgs::msg::BoundingBox boundingBox;
-				std::cout << "rosBoxCounter_[i]: " << rosBoxCounter_[i] << std::endl;
 				for (int j = 0; j < rosBoxCounter_[i]; j++) {
 					int xmin = rosBoxes_[i][j].x - rosBoxes_[i][j].w / 2;
 					int ymin = rosBoxes_[i][j].y - rosBoxes_[i][j].h / 2;

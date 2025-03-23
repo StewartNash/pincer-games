@@ -6,7 +6,7 @@
 + Backgammon
 + Go
 
-Games for a variant of the Arctos robotic arm called 'Pincer'. These games are developed from a fork of the tic tac toe computer vision repository provided by Arctos robotics. 
+Games for our variant of the Arctos robotic arm which we call 'Pincer'. These games are developed from a fork of the tic tac toe computer vision repository provided by Arctos robotics. And using other available algorithms which we will document.
 
 The system is ready to run inside a virtual machine (VM) with **ROS (Robot Operating System)** and **darknet_ros** already set up.
 
