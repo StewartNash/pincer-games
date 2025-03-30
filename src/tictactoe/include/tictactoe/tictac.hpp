@@ -68,8 +68,6 @@ class TicTacToe : public rclcpp::Node {
 		
 		std::map<std::string, std::array<std::array<double, 3>, 2>> positions;
 	private:
-		//void timer_callback();
-		//rclcpp::TimerBase::SharedPtr timer_;
 		rclcpp::Publisher<std_msgs::msg::String>::SharedPtr commandPublisher_;
 		rclcpp::Subscription<darknet_emulator_msgs::msg::BoundingBoxes>::SharedPtr boundingBoxesSubscriber_;
 		size_t count_;

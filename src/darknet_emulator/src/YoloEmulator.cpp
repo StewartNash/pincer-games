@@ -9,6 +9,8 @@
 
 #include "darknet_emulator/YoloEmulator.hpp"
 
+//#define DEBUG_VERSION
+
 using namespace darknet_emulator;
 
 RobotState::RobotState() {
@@ -23,25 +25,16 @@ void RobotState::processCommand(std::string command) {
 	std::string token;
 	double x, y, z;
 	
-	//std::cout << "Entering RobotState::processCommand(std::string command)" << std::endl;
-	//std::cout << "isGripperOpen: " << isGripperOpen << std::endl;
-	//std::cout << "gripperOpenCount: " << gripperOpenCount << std::endl;
-	//std::cout << "gripperCloseCount: " << gripperCloseCount << std::endl;
-	//std::cout << "isPlacementReady: " << isPlacementReady << std::endl;
 	partition = YoloEmulator::split(command, ',');
 	token = partition[0];
 	if (token == "open_gripper") {
 		isGripperOpen = true;
 		++gripperOpenCount;
-		if (gripperOpenCount == 2 * gripperCloseCount) { // assert(gripperOpenCount == gripperCloseCount)
+		if (gripperOpenCount == 2 * gripperCloseCount) {
 			position = positionQueue;
 			isPlacementReady = true;
 		} else {
-			//std::cout << "Lost gripper movement." << std::endl;
-			std::cout << "isGripperOpen: " << isGripperOpen << std::endl;
-			std::cout << "gripperOpenCount: " << gripperOpenCount << std::endl;
-			std::cout << "gripperCloseCount: " << gripperCloseCount << std::endl;
-			std::cout << "isPlacementReady: " << isPlacementReady << std::endl;			
+			// Robot is in transit?
 		}
 	} else if (token == "go_to_joint_state") {
 		try {
@@ -60,11 +53,6 @@ void RobotState::processCommand(std::string command) {
 	} else {
 	
 	}
-	//std::cout << "Exiting RobotState::processCommand(std::string command)" << std::endl;
-	//std::cout << "isGripperOpen: " << isGripperOpen << std::endl;
-	//std::cout << "gripperOpenCount: " << gripperOpenCount << std::endl;
-	//std::cout << "gripperCloseCount: " << gripperCloseCount << std::endl;
-	//std::cout << "isPlacementReady: " << isPlacementReady << std::endl;	
 }
 
 /*
@@ -117,7 +105,6 @@ std::map<int, std::tuple<int, int>> YoloEmulator::centerPixels = {
 	{9, {531, 363}}
 };
 
-//TODO: Review rows, columns, and indices to ensure correctness
 std::map<int, std::tuple<int, int>> YoloEmulator::arrayLocations = {
 	{1, {0, 0}},
 	{2, {0, 1}},
@@ -139,8 +126,10 @@ YoloEmulator::YoloEmulator() :
 	subscription_ = this->create_subscription<std_msgs::msg::String>("ui_command", 5, std::bind(&YoloEmulator::callback, this, std::placeholders::_1));
 	robotMoveTime = robotTimeDistribution(generator);
 	humanMoveTime = humanTimeDistribution(generator);
+	#ifdef DEBUG_VERSION
 	std::cout << "robotMoveTime: " << robotMoveTime << std::endl;
 	std::cout << "humanMoveTime: " << humanMoveTime << std::endl;
+	#endif
 	isHumanTurn = true;
 	isMoveReceived = false;
 	currentTime = 0;
@@ -156,28 +145,21 @@ void YoloEmulator::incrementTime(double increment) {
 	deltaTime += increment;
 	
 	if (isHumanTurn) {
-		//sleep(humanMoveTime);
 		if (deltaTime > humanMoveTime) {
 			deltaTime = std::fmod(deltaTime, humanMoveTime);
 			makeMove();
 			isHumanTurn = false;
 			humanMoveTime = humanTimeDistribution(generator);
-			//std::cout << "humanMoveTime: " << humanMoveTime << std::endl;
 		}
 	} else {
 		//sleep(robotMoveTime);
 		if (isMoveReceived) {
-			//std::cout << "YoloEmulator::incrementTime - move received" << std::endl;
-			//std::cout << "deltaTime: " << deltaTime << std::endl;
-			//std::cout << "robotMoveTime: " << robotMoveTime << std::endl;
 			if (deltaTime > robotMoveTime) {
-				std::cout << "YoloEmulator::incrementTime - robot move" << std::endl;
 				deltaTime = std::fmod(deltaTime, robotMoveTime);
 				populateBoard(robotQueue, ROBOT_CHARACTER);
 				isMoveReceived = false;
 				isHumanTurn = true;
 				robotMoveTime = robotTimeDistribution(generator);
-				//std::cout << "robotMoveTime: " << robotMoveTime << std::endl;
 			}
 		}
 	}
@@ -322,13 +304,10 @@ void YoloEmulator::makeMove() {
 	int location;
 
 	if (!checkEndGame()) {
-		std::cout << "Making move." << std::endl;
 		//TODO: Make random human move
 		for (int i = 0; i < X_SIZE; i++) {
 			for (int j = 0; j < Y_SIZE; j++) {
 				if (boardState[j][i] == '\0') {
-					std::cout << "j: "<< j << std::endl;
-					std::cout << "i: "<< i << std::endl;
 					location = findLocation(std::make_tuple(j, i));
 					break;
 				}
@@ -337,23 +316,26 @@ void YoloEmulator::makeMove() {
 		populateBoard(location, HUMAN_CHARACTER);
 	} else {
 		std::cout << "Game Over!" << std::endl;
-		// Game Over
 	}
 }
 
 void YoloEmulator::populateBoard(int location, char player) {
 	int row, column;
 	
+	#ifdef DEBUG_VERSION
 	std::cout << "YoloEmulator::populateBoard: " << "Entering." << std::endl;
 	std::cout << "location: " << location << std::endl;
 	std::cout << "player: " << player << std::endl;
+	#endif
 	printBoardState();
 	row = std::get<0>(arrayLocations[location]);
 	column = std::get<1>(arrayLocations[location]);
 	//TODO: Check for conflicts
 	boardState[row][column] = player;
 	printBoardState();
+	#ifdef DEBUG_VERSION
 	std::cout << "YoloEmulator::populateBoard: " << "Exiting." << std::endl;
+	#endif
 }
 
 void YoloEmulator::printBoardState() {
@@ -407,24 +389,30 @@ void YoloEmulator::printBoardState() {
 }
 
 void YoloEmulator::receiveMove(double xPosition, double yPosition) {
+	#ifdef DEBUG_VERSION
 	std::cout << "YoloEmulator::receiveMove: Entered subroutine." << std::endl;
 	std::cout << "isHumanTurn: " << isHumanTurn << std::endl;
 	std::cout << "isMoveReceived: " << isMoveReceived << std::endl;
+	#endif
 	if (!isHumanTurn && !isMoveReceived) {
 		robotQueue = convertToLocation(convertToPixels(xPosition, yPosition));
+		#ifdef DEBUG_VERSION
 		std::cout << "xPosition: " << xPosition << std::endl;
 		std::cout << "yPosition: " << yPosition << std::endl;
 		std::cout << "convertToPixels(xPosition, yPosition)[0]: " << std::get<0>(convertToPixels(xPosition, yPosition)) << std::endl;
 		std::cout << "convertToPixels(xPosition, yPosition)[1]: " << std::get<1>(convertToPixels(xPosition, yPosition)) << std::endl;
 		std::cout << "convertToLocation(convertToPixels(xPosition, yPosition)): " << convertToLocation(convertToPixels(xPosition, yPosition)) << std::endl;
+		#endif
 		isMoveReceived = true;
 	} else if (!isHumanTurn && isMoveReceived) {
 		// Wait for robot's movement to complete.
 	} else {
-		std::cout << "Multiple and/or out-of-turn robot moves received." << std::endl;
+		//std::cout << "Multiple and/or out-of-turn robot moves received." << std::endl;
 		throw "Multiple and/or out-of-turn robot moves received.";
 	}
-	std::cout << "YoloEmulator::receiveMove: Exiting subroutine." << std::endl;	
+	#ifdef DEBUG_VERSION
+	std::cout << "YoloEmulator::receiveMove: Exiting subroutine." << std::endl;
+	#endif
 }
 
 // Static methods
@@ -436,10 +424,12 @@ int YoloEmulator::convertToLocation(int xPixel, int yPixel) {
 	
 	pixel = std::make_tuple(xPixel, yPixel);
 	for (int i = 0; i < BOARD_SIZE; i++)  {
+		#ifdef DEBUG_VERSION
 		std::cout << "centerPixels[" << i + 1 << "]: (" << std::get<0>(centerPixels[i + 1]);
 		std::cout << ", " << std::get<1>(centerPixels[i + 1]) << ")" << std::endl;
 		std::cout << "getDistance(pixel, centerPixels[i + 1]): ";
 		std::cout << getDistance(pixel, centerPixels[i + 1]) << std::endl;
+		#endif
 		if (i == 0) {
 			location = i + 1;
 			minimumDistance = getDistance(pixel, centerPixels[i + 1]);

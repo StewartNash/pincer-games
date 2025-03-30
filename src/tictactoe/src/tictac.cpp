@@ -1,5 +1,7 @@
 #include "tictactoe/tictac.hpp"
 
+//#define DEBUG_VERSION
+
 using namespace pincergames;
 //using namespace std::chrono_literals
 
@@ -85,9 +87,6 @@ TicTacToe::TicTacToe() : rclcpp::Node("tic_tac_toe_robot"), count_(0) {
 	std::cout << "\nPress 'r' and Enter to restart the game at any time" << std::endl;
 
 	commandPublisher_ = this->create_publisher<std_msgs::msg::String>("ui_command", 10);
-	////timer_ = this->create_wall_timer(500ms, std::bind(&TicTacToe::timer_callback, this));
-	//timer_ = this->create_wall_timer(std::literals::chrono_literals::operator""ms(500), std::bind(&TicTacToe::timer_callback, this));
-	//boundingBoxesSubscriber_ = this->create_subscription<darknet_emulator_msgs::msg::BoundingBoxes>("darknet_emulator_msgs/bounding_boxes", 1,  std::bind(&TicTacToe::boundingBoxesCallback, this, std::placeholders::_1));
 	boundingBoxesSubscriber_ = this->create_subscription<darknet_emulator_msgs::msg::BoundingBoxes>("bounding_boxes", 1,  std::bind(&TicTacToe::boundingBoxesCallback, this, std::placeholders::_1));
 }
 
@@ -100,14 +99,7 @@ TicTacToe::~TicTacToe() {
 	commandPublisher_.reset();
 	//timer_.reset();
 }
-/*
-void TicTacToe::timer_callback() {
-	auto message = std_msgs::msg::String();
-	message.data = "TicTacToe " + std::to_string(count_++);
-	RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
-	publisher_->publish(message);
-}
-*/
+
 void TicTacToe::handleKeyboardInput() {
 	char userInput;
 	while (!stopThread.load()) {
@@ -238,7 +230,7 @@ void TicTacToe::boundingBoxesCallback(const darknet_emulator_msgs::msg::Bounding
 			
 			if (checkWinner()) {
 				std::cout << "\nHuman wins!" << std::endl;
-				//TODO: display HUMAN_WINS
+				std::cout << HUMAN_WINS << std::endl;
 				gameActive = false;
 				return;
 			}
@@ -299,7 +291,9 @@ std::array<std::array<double, 3>, 2> TicTacToe::applyJointOffsets(std::array<std
 }
 
 void TicTacToe::clearTerminal() {
-	//std::cout << "\033[2J\033[1;1H";
+	#ifndef DEBUG_VERSION
+	std::cout << "\033[2J\033[1;1H";
+	#endif
 }
 
 int TicTacToe::mapBoundingBoxToGrid(darknet_emulator_msgs::msg::BoundingBox box) {
