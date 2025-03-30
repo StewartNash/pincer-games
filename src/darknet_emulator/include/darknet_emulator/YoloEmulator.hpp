@@ -78,15 +78,17 @@ class YoloEmulator : public rclcpp::Node {
 		static constexpr double FLOAT_TOP_BOUNDARY = 25.0;
 		static constexpr double FLOAT_BOTTOM_BOUNDARY = 431.0;		
 		
-		static constexpr double X_DISTANCE_PIXELS = 100.25;
-		static constexpr double Y_DISTANCE_PIXELS = 101.5;
+		//static constexpr double X_DISTANCE_PIXELS = 100.25;
+		static constexpr double X_DISTANCE_PIXELS = 133.667;
+		//static constexpr double Y_DISTANCE_PIXELS = 101.5;
+		static constexpr double Y_DISTANCE_PIXELS = 135.333;
 		//static constexpr double MEAN_X_SEPARATION = 0.01;
 		//static constexpr double MEAN_Y_SEPARATION = 0.01;
 		static constexpr double X_DISTANCE = 0.213;
 		static constexpr double Y_DISTANCE = 0.165;
 		static constexpr double X_STDDEV = 0.032;
 		static constexpr double Y_STDDEV = 0.048;
-		static constexpr double X_ORIGIN = -0.99;
+		static constexpr double X_ORIGIN = -1.42;
 		static constexpr double Y_ORIGIN = 1.21;
 		
 		static constexpr double X_RESOLUTION = X_DISTANCE / X_DISTANCE_PIXELS;
@@ -115,18 +117,14 @@ class YoloEmulator : public rclcpp::Node {
 		static std::map<int, std::tuple<int, int>> centerPixels;
 		static std::map<int, std::tuple<int, int>> arrayLocations;
 		
-		std::mt19937 generator;
-		std::normal_distribution<double> robotTimeDistribution;
-		std::normal_distribution<double> humanTimeDistribution;
-		
-		//double averageXMoveTime = 30.0; // seconds
-		//double averageOMoveTime = 30.0; // seconds
-		//double xMoveTimeStdDev = 7.5; // seconds
-		//double yMoveTimeStdDev = 7.4; // seconds
-		double averageHumanMoveTime = 30.0; // seconds
-		double averageRobotMoveTime = 30.0; // seconds
-		double humanMoveTimeStdDev = 7.5; // seconds
-		double robotMoveTimeStdDev = 7.5; // seconds
+		//double averageXMoveTime = 15.0; // seconds
+		//double averageOMoveTime = 15.0; // seconds
+		//double xMoveTimeStdDev = 3.0; // seconds
+		//double yMoveTimeStdDev = 3.0; // seconds
+		double averageHumanMoveTime = 7.0; // seconds
+		double averageRobotMoveTime = 7.0; // seconds
+		double humanMoveTimeStdDev = 1.5; // seconds
+		double robotMoveTimeStdDev = 1.5; // seconds
 		double robotMoveTime;
 		double humanMoveTime;
 		double currentTime;
@@ -138,14 +136,19 @@ class YoloEmulator : public rclcpp::Node {
 		bool isHumanTurn;
 		bool isMoveReceived; // Robot move
 		int robotQueue;
+		
+		std::mt19937 generator;
+		std::normal_distribution<double> robotTimeDistribution;
+		std::normal_distribution<double> humanTimeDistribution;		
 
 		void callback(std_msgs::msg::String command);
 		bool checkEndGame();
 		int findLocation(std::tuple<int, int> indices);
 		void makeMove();
 		void populateBoard(int location, char player);
+		void printBoardState();
 		void receiveMove(double xPosition, double yPosition);
-
+		
 		static int convertToLocation(int xPixel, int yPixel);
 		static int convertToLocation(std::tuple<int, int> pixel);
 		static int convertToLocation(double xPosition, double yPosition);

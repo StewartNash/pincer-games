@@ -97,6 +97,8 @@ class TicTacToe : public rclcpp::Node {
 		void moveToCoordinates(std::array<std::array<double, 3>, 2> coords);
 		std::string updateGripperState(std::string action);
 		void updateDisplay(std::string status);
+		
+		static void printArray(char* array, int length);
 };
 
 } /* namespace pincergames */

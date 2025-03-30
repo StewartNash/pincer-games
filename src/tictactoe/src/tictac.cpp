@@ -14,7 +14,8 @@ TicTacToe::TicTacToe() : rclcpp::Node("tic_tac_toe_robot"), count_(0) {
 	gameActive = true;
 
 	inputThread = std::thread(&TicTacToe::handleKeyboardInput, this);
-
+	
+	/*
 	positions["1AP"] = {{{{-1.300, 1.049, -0.818}}, {{0.000, 0.110, -0.267}}}};
 	positions["1"] = {{{{-1.310, 1.197, -0.764}}, {{0.000, 0.312, -0.267}}}};
 	positions["2AP"] = {{{{-1.101, 1.049, -0.766}}, {{0.000, 0.075, -0.616}}}};
@@ -44,6 +45,37 @@ TicTacToe::TicTacToe() : rclcpp::Node("tic_tac_toe_robot"), count_(0) {
 	positions["T9AP"] = {{{{-1.387, 1.284, 0.412}}, {{0.000, -0.955, -0.302}}}};
 	positions["T9"] = {{{{-1.387, 1.429, 0.520}}, {{0.000, -0.955, -0.197}}}};
 	positions["TOP_CENTER"] = {{{{-0.136, 1.018, 1.639}}, {{0.000, -0.640, -0.581}}}};
+	*/
+	
+	positions["1AP"] = {{{{-1.300, 1.049, -0.818}}, {{0.000, 0.110, -0.267}}}};
+	positions["1"] = {{{{-1.310, 1.197, -0.764}}, {{0.000, 0.312, -0.267}}}};
+	positions["2AP"] = {{{{-1.101, 1.049, -0.766}}, {{0.000, 0.075, -0.616}}}};
+	positions["2"] = {{{{-1.096, 1.183, -0.716}}, {{0.000, 0.232, -0.511}}}};
+	positions["3AP"] = {{{{-0.906, 1.049, -0.668}}, {{0.000, 0.075, -0.826}}}};
+	positions["3"] = {{{{-0.916, 1.171, -0.607}}, {{0.000, 0.075, -0.721}}}};
+	positions["4AP"] = {{{{-0.766, 1.049, -0.529}}, {{0.000, -0.099, -1.035}}}};
+	positions["4"] = {{{{-0.766, 1.173, -0.431}}, {{0.000, -0.099, -0.930}}}};
+	positions["5AP"] = {{{{-0.661, 1.066, -0.396}}, {{0.000, -0.099, -1.209}}}};
+	positions["5"] = {{{{-0.668, 1.199, -0.274}}, {{0.000, -0.274, -1.105}}}};
+	positions["T7AP"] = {{{{-0.888, 1.129, -0.103}}, {{0.000, -0.518, -0.930}}}};
+	positions["T7"] = {{{{-0.991, 1.205, -0.016}}, {{0.000, -0.518, -0.756}}}};
+	positions["T8AP"] = {{{{-1.004, 1.246, 0.265}}, {{0.000, -0.780, -0.756}}}};
+	positions["T8"] = {{{{-0.991, 1.370, 0.363}}, {{0.000, -0.780, -0.651}}}};
+	positions["T9AP"] = {{{{-1.080, 1.456, 0.754}}, {{0.000, -1.042, -0.581}}}};
+	positions["T9"] = {{{{-0.991, 1.536, 0.925}}, {{0.000, -1.077, -0.581}}}};
+	positions["T4AP"] = {{{{-1.087, 1.045, -0.335}}, {{0.000, -0.274, -0.581}}}};
+	positions["T4"] = {{{{-1.204, 1.205, -0.234}}, {{0.000, -0.379, -0.581}}}};
+	positions["T5AP"] = {{{{-1.164, 1.167, 0.066}}, {{0.000, -0.641, -0.581}}}};
+	positions["T5"] = {{{{-1.204, 1.370, 0.169}}, {{0.000, -0.641, -0.477}}}};
+	positions["T6AP"] = {{{{-1.230, 1.359, 0.534}}, {{0.000, -0.955, -0.477}}}};
+	positions["T6"] = {{{{-1.204, 1.536, 0.639}}, {{0.000, -0.955, -0.372}}}};
+	positions["T1AP"] = {{{{-1.314, 1.045, -0.431}}, {{0.000, -0.274, -0.232}}}};
+	positions["T1"] = {{{{-1.418, 1.205, -0.339}}, {{0.000, -0.274, -0.232}}}};
+	positions["T2AP"] = {{{{-1.370, 1.145, -0.042}}, {{0.000, -0.606, -0.302}}}};
+	positions["T2"] = {{{{-1.418, 1.370, 0.045}}, {{0.000, -0.606, -0.197}}}};
+	positions["T3AP"] = {{{{-1.387, 1.284, 0.412}}, {{0.000, -0.955, -0.302}}}};
+	positions["T3"] = {{{{-1.418, 1.536, 0.520}}, {{0.000, -0.955, -0.197}}}};
+	positions["BOTTOM_LEFT"] = {{{{-0.136, 1.018, 1.639}}, {{0.000, -0.640, -0.581}}}};
 
 	resetGame();
 
@@ -170,7 +202,7 @@ void TicTacToe::boundingBoxesCallback(const darknet_emulator_msgs::msg::Bounding
 		return;
 	}
 
-	std::strcpy(currentBoard, committedMoves);
+	std::memcpy(currentBoard, committedMoves, sizeof(committedMoves));
 
 	// Process all detected boxes
 	for (darknet_emulator_msgs::msg::BoundingBox box : data.bounding_boxes) {
@@ -179,7 +211,7 @@ void TicTacToe::boundingBoxesCallback(const darknet_emulator_msgs::msg::Bounding
 			if (box.class_id == "oxx" && committedMoves[moveIndex] == '\0') {
 				currentBoard[moveIndex] = 'O';
 			} else if (box.class_id == "ixx") {
-				// For X moves, only show them if they're committedMOves
+				// For X moves, only show them if they're committedMoves
 				if (committedMoves[moveIndex] == 'X') {
 					currentBoard[moveIndex] = 'X';
 				}
@@ -197,8 +229,8 @@ void TicTacToe::boundingBoxesCallback(const darknet_emulator_msgs::msg::Bounding
 		if (newOMoves.size() == 1) { // Exactly one new O move
 			moveIndex = newOMoves[0];
 			committedMoves[moveIndex] = 'O'; // Commit the move
-			std::strcpy(boardState, committedMoves);
-			std::strcpy(lastDetectedBoard, boardState);
+			std::memcpy(boardState, committedMoves, sizeof(committedMoves));
+			std::memcpy(lastDetectedBoard, boardState, sizeof(boardState));
 			waitingForHuman = false;
 			
 			clearTerminal();
@@ -213,9 +245,14 @@ void TicTacToe::boundingBoxesCallback(const darknet_emulator_msgs::msg::Bounding
 			
 			// Make robot's move
 			bestMove = findBestMove();
+			std::cout << "bestMove: " << bestMove << std::endl;
 			if (bestMove >= 0) {
 				committedMoves[bestMove] = 'X'; // Commit the robot's move
-				std::strcpy(boardState, committedMoves);
+				std::memcpy(boardState, committedMoves, sizeof(committedMoves)); 
+				std:: cout << "boardState: ";
+				printArray(boardState, BOARD_POSITIONS);
+				std::cout << "committedMoves: ";
+				printArray(committedMoves, BOARD_POSITIONS);
 				pickAndPlace(bestMove);
 				currentFigure += 1;
 				
@@ -262,7 +299,7 @@ std::array<std::array<double, 3>, 2> TicTacToe::applyJointOffsets(std::array<std
 }
 
 void TicTacToe::clearTerminal() {
-	std::cout << "\033[2J\033[1;1H";
+	//std::cout << "\033[2J\033[1;1H";
 }
 
 int TicTacToe::mapBoundingBoxToGrid(darknet_emulator_msgs::msg::BoundingBox box) {
@@ -282,11 +319,11 @@ int TicTacToe::mapBoundingBoxToGrid(darknet_emulator_msgs::msg::BoundingBox box)
 	xPos = (boxXCenter - leftBoundary) / (rightBoundary - leftBoundary);
 	yPos = (boxYCenter - topBoundary) / (bottomBoundary - topBoundary);
 
-	gridX = static_cast<int>(xPos * 3.0);
-	gridY = static_cast<int>(yPos * 3.0);
+	gridX = static_cast<int>(xPos * X_SIZE);
+	gridY = static_cast<int>(yPos * Y_SIZE);
 
-	if (0 <= gridX && gridX <= 3 && 0 <= gridY && gridY < 3) {
-		return gridY * 3 + gridX;
+	if (0 <= gridX && gridX <= X_SIZE && 0 <= gridY && gridY < Y_SIZE) {
+		return gridY * X_SIZE + gridX;
 	}
 	return -1;
 }
@@ -545,4 +582,15 @@ void TicTacToe::updateDisplay(std::string status) {
 	clearTerminal();
 	displayBoard();
 	std::cout << "\nRobot action: " << status << std::endl;
+}
+
+void TicTacToe::printArray(char* array, int length) {
+	for (int i = 0; i < length; i++) {
+		if (array[i] == '\0') {
+			std::cout << ' ';
+		} else {
+			std::cout << array[i];
+		};
+	}
+	std::cout << std::endl;
 }
