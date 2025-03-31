@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="tictactoe" exec="tictactoe_node"/>
+  <node pkg="darknet_emulator" exec="detector_node"/>
+</launch>
