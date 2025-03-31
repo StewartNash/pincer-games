@@ -10,6 +10,26 @@ find_package(ament_cmake REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(darknet_emulator_msgs REQUIRED)
+
+include_directories(
+  include
+)
+
+add_executable(checkers_node src/checkers_node.cpp src/checkers.cpp)
+ament_target_dependencies(checkers_node rclcpp std_msgs darknet_emulator_msgs)
+
+install(
+  DIRECTORY include/checkers/
+  DESTINATION include/checkers
+)
+
+install(
+  TARGETS checkers_node
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -22,5 +42,7 @@ if(BUILD_TESTING)
   set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
+
+ament_export_include_directories(include)
 
 ament_package()

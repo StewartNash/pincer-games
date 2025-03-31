@@ -3,11 +3,15 @@
 <package format="3">
   <name>checkers</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>Checkers node for Pincer project based on Arctos robotic arm</description>
   <maintainer email="pervigilent@gmail.com">Stewart Nash</maintainer>
   <license>MIT</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
+  
+  <depend>rclcpp</depend>
+  <depend>std_msgs</depend>
+  <depend>darknet_emulator</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

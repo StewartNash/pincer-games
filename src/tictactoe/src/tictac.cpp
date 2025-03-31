@@ -3,7 +3,6 @@
 //#define DEBUG_VERSION
 
 using namespace pincergames;
-//using namespace std::chrono_literals
 
 TicTacToe::TicTacToe() : rclcpp::Node("tic_tac_toe_robot"), count_(0) {
 	std::fill(std::begin(boardState), std::end(boardState), '\0');
