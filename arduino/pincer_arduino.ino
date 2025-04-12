@@ -104,6 +104,9 @@ ros::Subscriber<std_msgs::UInt16> gripper_sub("gripper_angle", gripper_cb); // s
 void setup() {
   // Put your setup code here, to run once:
   // Serial.begin(57600);
+  
+  Serial.begin(9600);
+  
   pinMode(13, OUTPUT);
   joint_status = 1;
 

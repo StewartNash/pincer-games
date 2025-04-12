@@ -1,146 +1,107 @@
 # Pincer Games
 
-+ Tic Tac Toe
++ Tic-Tac-Toe
 + Checkers
 + Chess
 + Backgammon
 + Go
 
-Games for our variant of the Arctos robotic arm which we call 'Pincer'. These games are developed from a fork of the tic tac toe computer vision repository provided by Arctos robotics. And using other available algorithms which we will document.
+## Introduction
 
-The system is ready to run inside a virtual machine (VM) with **ROS (Robot Operating System)** and **darknet_ros** already set up.
+This repository is a fork of the Arctos robotics computer vision repository for its robotic arm. We call our project which utilizes the arm 'Pincer'. The repository is intended to offer several popular games that the robot can play against a human (or even another robot) opponent using computer vision.
+
+### Caveats
+
+The repository is currently under development. It is provided as is without warranty or guarantees. Some or all of the games are not yet functioning. I will update this document when the repository has been finalized. Feel free to make any contributions you would like.
+
+The repository is intended to be run in conjunction with darknet_ros. However, we'll have to create our own darknet_ros fork in the future in order to customize it to use custom game pieces. We'll also have to create the custom game pieces.
+
+## Games
+
+This repository provides several popular games. The games are currently under development. The games will use computer vision with the YOLOv3 library to play against an opponent. CAD files for the game pieces may be included in the future.
+
+### Tic-Tac-Toe
+
+This game is based off of the tictac.py script provided by Arctos.
+
+### Checkers
+
+This game is under development. Links and information on algorithm sources will be provided.
+
+### Chess
+
+This game is under development. Links and information on algorithm sources will be provided.
+
+### Backgammon
+
+This game is under development. Links and information on algorithm sources will be provided.
+
+### Go
+
+This game is under development. Links and information on algorithm sources will be provided.
+
+## Requirements
+
+TBD - Requirements are to be determined. They may include the following:
+
+- A computer with ROS
+- A camera
+- An Arduino
 
 ---
 
-# 🎮 YOLOv3 Tic Tac Toe Game
+## Setup
 
-This repository provides a pre-configured Tic Tac Toe game where the computer uses **YOLOv3** for computer vision to play Tic Tac Toe against a human player.
+Setup instructions will be provided in the future. The setup will hopefully be limited to the following steps:
 
----
-
-## ⚙️ Requirements
-
-- **Computer with ROS**
-- **USB Camera**
-- **Arduino Board**
-
----
-
-## 📥 Setup Instructions
-
-Follow these steps to run the any game:
-
-### 1. Clone the repository
-
-1. Clone the github repository
-2. Build the ROS code.
-
-### 2. Connect Devices
-
-1. Open the Virtual Machine.
-2. In the top menu, go to **Devices > USB >** and select:
-   - Your connected **USB Camera**.
-   - Your connected **Arduino** board.
+1. Clone the repository
+2. Build the ROS code
+3. Ensure all hardware is connected and operating
+3. Run the launch file
    
-### 3. Emulator
+### Emulator
 
-Emulators can be run in place of physical hardware.
+An emulator and test scripts for each game are under development. It is hoped that we will have emulators that can be run in place of physical hardware.
 
----
+### Manual Launch
 
-## ▶️ Run the Game
-
-The game can be launched automatically through the desktop app provided. Follow these steps:
-
-### Method 1: Run the Desktop App (Automatic)
-
-1. Double-click the desktop shortcut **"Arctos CV"** on the virtual machine's desktop.
-
-This shortcut will:
-- Launch all necessary ROS nodes:
-   - YOLOv3 for object detection.
-   - USB Camera driver.
-- Start the Tic Tac Toe script `tictac.py`.
-
-### Method 2: Run Manually
-
-If you prefer to run the game manually, follow these steps:
-
+Previous manual launch instructions were as follows
 1. **Open Terminal** and source ROS environment:
-
    ```bash
    source /opt/ros/melodic/setup.bash
    source ~/catkin_workspace/devel/setup.bash
    ```
-
 2. **Launch YOLOv3** for object detection:
-
    ```bash
    roslaunch darknet_ros darknet_ros.launch
    ```
-
 3. **Launch the USB Camera** node:
-
    ```bash
    roslaunch usb_cam usb_cam-test.launch
    ```
-
 4. **Run the Tic Tac Toe script**:
-
    ```bash
    python3 ~/catkin_workspace/src/darknet_ros/darknet/scripts/tictac.py
    ```
 
----
+## Troubleshooting
 
-## 🧩 Script Details: `tictac.py`
+### Customizing the Script
 
-The `tictac.py` script is responsible for:
+#### Custom include files for Arduino
 
-1. **Listening** to YOLOv3 bounding boxes for move detection.
-2. **Controlling the robotic arm** to place the "X" marker at the correct position.
-3. Managing the Tic Tac Toe game logic and updating the board state.
+Include files for the Arduino must end in '.hpp'. If the include file is to be included in only one sketch, it can be included in the same directory as the sketch. It can also be created by creating a new tab in the Arduino IDE and naming the file appropriately. If the include file is meant to be shared by multiple sketches, then it is preferable to create a library by doing the following:
+- Close the Arduino IDE
+- Navigate to the {Arduino}\hardware\libraries directory
+- Create a sub-directory with the name of your library
+- Open the header file and insert your code
+- Open the Arduino IDE
+- Create or open a Sketch
+- Add an #include to the Sketch that references the new include file
+    - I believe that the included file may need to be in quotes
 
-### Key Features:
-- **ASCII Art:** The script prints ASCII art messages to indicate the winner (Robot, Human, or Tie).
-- **Reset Option:** Press `r` and Enter to restart the game at any time.
-- **Move Validation:** Detects and validates moves using bounding boxes.
-
----
-
-## 🔧 Customize the Script
-
-If you want to customize the game or change behavior, edit the `tictac.py` script located here:
-
-```bash
-~/catkin_workspace/src/darknet_ros/darknet/scripts/tictac.py
-```
-
-For example:
-- Modify board positions.
-- Change robot move strategies.
-- Add new visual effects.
-
----
-
-## 🎉 Enjoy Playing!
-
-Once everything is running, enjoy challenging the robot to a Tic Tac Toe game powered by **computer vision**!
-
----
-
-## 💬 Troubleshooting
-
-If you encounter issues:
-- Make sure all devices (camera, Arduino) are correctly connected to the virtual machine.
-- Verify the ROS nodes are running properly using `rosnode list`.
-- Check for errors in the terminal when running `tictac.py`.
-
----
-
-### 🤝 Credits
-- **Darknet YOLOv3:** For real-time object detection.
-- **ROS Jazzy Jalisco:** For handling robotic commands and environment.
-- **Arctos Robotics:** For providing robots.
----
+## References
+- **Darknet YOLOv3:** Insert link here
+- **ROS Jazzy Jalisco:** Insert link here
+- **Arctos Robotics:** Insert link here
 
