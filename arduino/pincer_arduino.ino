@@ -1,27 +1,28 @@
-/* Purpose: This sketch uses ROS as well as MultiStepper, AccelStepper, and Servo libraries to control the 
- * 6-axis robotic arm. In this setup, a Ramps 1.4 shield is used on top of an Arduino Mega 2560.  
- * Subscribing to the following ROS topics: 1) joint_steps, 2) gripper_angle
- *    1) joint_steps is computed from the simulation on the PC and sent to Arduino via rosserial. It contains
- *       the steps (relative to the starting position) necessary for each motor to move to reach the goal position.
- *    2) gripper_angle contains the necessary gripper angle to grasp the object when the goal state is reached.
+/*
+ * Original Author: Jesse Weisberg
+ *
+ * Original Description: Use ROS, MultiStepper, AccelStepper, and Servo libraries
+ * to control 6-axis robotic arm. Ramps 1.4 shield used on Arduino Mega 2560.  
+ * Subscribes to ROS topics 'joint_steps' and 'gripper_angle'. joint_steps
+ * computed from PC simulation and sent to Arduino via rosserial. Contains
+ * steps (relative to start position) for motors to reach goal position.
+ * gripper_angle contains gripper angle to grasp object when goal state is
+ * reached. Publishes to 'joint_steps_feedback' used for debugging to ensure
+ * Arduino is receiving joint_steps data accurately.
  * 
- * Publishing to the following ROS topics: joint_steps_feedback
- *    1) joint_steps_feedback is a topic used for debugging to make sure the Arduino is receiving the joint_steps data
- *       accurately
- *       
- * Author: Jesse Weisberg
  */
 #if (ARDUINO >= 100)
   #include <Arduino.h>
 #else
   #include <WProgram.h>
 #endif
-#include <ros.h>
+//#include <ros.h>
+#include "pseudonode.hpp"
 
-#include <moveo_moveit/ArmJointState.h>
+//#include <moveo_moveit/ArmJointState.h>
 #include <Servo.h> 
-#include <std_msgs/Bool.h>
-#include <std_msgs/String.h>
+//#include <std_msgs/Bool.h>
+//#include <std_msgs/String.h>
 #include <math.h>
 #include <std_msgs/Int16.h>
 #include <std_msgs/UInt16.h>
@@ -74,12 +75,15 @@ MultiStepper steppers;
 int joint_step[6];
 int joint_status = 0;
 
-ros::NodeHandle nh;
-std_msgs::Int16 msg;
+//ros::NodeHandle nh;
+//std_msgs::Int16 msg;
+
+pseudoros::PseudoNode nh(joint_step);
 
 // Instantiate publisher (for debugging purposes)
 //ros::Publisher steps("joint_steps_feedback",&msg);
 
+/*
 void arm_cb(const moveo_moveit::ArmJointState& arm_steps) {
   joint_status = 1;
   joint_step[0] = arm_steps.position1;
@@ -95,10 +99,11 @@ void gripper_cb(const std_msgs::UInt16& cmd_msg) {
   gripper.write(cmd_msg.data); // Set servo angle, should be from 0-180  
   digitalWrite(13, HIGH - digitalRead(13));  // Toggle LED  
 }
+*/
 
 // Instantiate subscribers
-ros::Subscriber<moveo_moveit::ArmJointState> arm_sub("joint_steps", arm_cb); // subscribes to joint_steps on arm
-ros::Subscriber<std_msgs::UInt16> gripper_sub("gripper_angle", gripper_cb); // subscribes to gripper position
+//ros::Subscriber<moveo_moveit::ArmJointState> arm_sub("joint_steps", arm_cb); // subscribes to joint_steps on arm
+//ros::Subscriber<std_msgs::UInt16> gripper_sub("gripper_angle", gripper_cb); // subscribes to gripper position
 // To publish from terminal: rostopic pub gripper_angle std_msgs/UInt16 <0-180>
 
 void setup() {
@@ -108,12 +113,13 @@ void setup() {
   Serial.begin(9600);
   
   pinMode(13, OUTPUT);
-  joint_status = 1;
+  //joint_status = 1;
+  nh.jointStatus = 1;
 
-  nh.initNode();
-  nh.subscribe(arm_sub);
-  nh.subscribe(gripper_sub);
-  // nh.advertise(steps);
+  //nh.initNode();
+  //nh.subscribe(arm_sub);
+  //nh.subscribe(gripper_sub);
+  ////nh.advertise(steps);
 
   // Configure each stepper
   joint1.setMaxSpeed(1500);
@@ -138,8 +144,11 @@ void setup() {
 }
 
 void loop() {
-  if (joint_status == 1) // If command callback (arm_cb) is being called, execute stepper command
-  { 
+  if (Serial.available()) {
+    String inputString = Serial.readStringUntil('\n');
+    nh.enqueueMessage(inputString);
+  }
+  if (nh.jointStatus == 1) { // If command callback (armCallback) is being called, execute stepper command 
     long positions[6];  // Array of desired stepper positions must be long
     positions[0] = joint_step[0];
     positions[1] = joint_step[1];
@@ -158,7 +167,7 @@ void loop() {
     gripper.write(joint_step[5]);  // Move gripper after manipulator reaches the goal   
   }
   digitalWrite(13, HIGH - digitalRead(13)); // Toggle LED
-  joint_status = 0;
+  nh.jointStatus = 0;
   
   nh.spinOnce();
   delay(1);
