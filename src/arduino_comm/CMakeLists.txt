@@ -10,6 +10,54 @@ find_package(ament_cmake REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(std_msgs REQUIRED)
+
+include_directories(
+  include
+  ../serial/include
+)
+
+add_library(
+  serial_library
+  ../serial/src/serial.cc
+)
+
+add_library(
+  arduinocomm
+  src/arduinocomm.cpp
+)
+
+target_link_libraries(
+  arduinocomm
+  serial_library
+)
+
+ament_target_dependencies(
+  arduinocomm
+  rclcpp
+  std_msgs
+)
+
+add_executable(
+  arduinocomm_node
+  src/arduinocomm_node.cpp
+)
+
+target_link_libraries(
+  arduinocomm_node
+  arduinocomm
+)
+
+install(
+  DIRECTORY include/
+  DESTINATION include/
+)
+
+install(
+  TARGETS arduinocomm_node arduinocomm serial_library
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -22,5 +70,7 @@ if(BUILD_TESTING)
   set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
+
+ament_export_include_directories(include)
 
 ament_package()

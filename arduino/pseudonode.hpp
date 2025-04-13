@@ -28,9 +28,13 @@ class PseudoNode {
 		PseudoNode(int* joint_step);
 		ArmJoint armSteps;
 		int jointStatus;
+		double stepAngle;
 
+		int radiansToSteps(double radians);
 		void enqueueMessage(String inputString);
 		void spinOnce();
+
+		static double radiansToDegrees(double radians);
 		static std::vector<std::string> split(const std::string& s, char separator);
 	private:
 		char* messageQueue;
@@ -43,6 +47,7 @@ class PseudoNode {
 
 PseudoNode::PseudoNode(int* joint_step) {
 	jointStep = joint_step;	
+	stepAngle = 1.8;
 }
 
 void PseudoNode::armCallback() {
@@ -71,8 +76,22 @@ void PseudoNode::parseCommand(std::string command) {
 
 }
 
+int radiansToSteps(double radians) {
+	double steps;
+
+	steps = radiansToDegrees(radians) / stepAngle;
+
+	return static_cast<int>(steps);
+}
+
 void PseudoNode::spinOnce() {
 
+}
+
+double radiansToDegrees(double radians) {
+	const double PI = 3.141592653589793;
+
+	return radians * 180.0 / PI;
 }
 
 std::vector<std::string> PseudoNode::split(const std::string& s, char separator) {
