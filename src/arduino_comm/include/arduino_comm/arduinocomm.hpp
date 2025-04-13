@@ -1,4 +1,4 @@
-
+#pragma once
 
 #include "serial/serial.h"
 #include "rclcpp/rclcpp.hpp"
@@ -12,7 +12,9 @@ class ArduinoComm : public rclcpp::Node {
 		~ArduinoComm();
 	private:
 		rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_;
-		void subscriberCallback(const std_msgs::msg::String data);
+		serial::Serial serial_port_;
+		
+		void subscriberCallback(const std_msgs::msg::String::SharedPtr data);
 };
 
 } /* namespace pincergames */
