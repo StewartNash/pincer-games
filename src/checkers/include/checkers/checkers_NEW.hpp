@@ -59,57 +59,36 @@ class Checkers : public rclcpp::Node {
 		void displayBoard();
 };
 
-enum Color{ NO_COLOR, RED, BLACK };
-
-struct Piece {
-  int row;
-  int column;
-  Color color;
-  bool isKing;
-};
-
+enum Player { MIN_PLAYER, MAX_PLAYER };
+enum Pieces { NO_PIECE, RED_CHECKER, BLACK_CHECKER, RED_KING, BLACK_KING };
 struct Move {
-
+  int fromRow, fromColumn;
+  int toRow, toColumn;
 };
 
 class Board {
   public:
-    Board();
-
-    Piece board[Checkers::Y_SIZE][Checkers::X_SIZE];
-    int redLeft, whiteLeft;
-    int redKings, whiteKings;
-
-    double evaluate();
-    std::vector<Piece> getAllPieces(Color color);
-    void move(Piece piece, int row, int column);
-    Piece getPiece(int row, int column);
-    void createBoard();
-    void remove(std::vector<Piece> pieces);
-    Color winner();
-    std::vector<Move> getValidMoves(Piece piece);
-	
-  private:
-    std::vector<Move> traverseLeft();
-    std::vector<Move> traverseRight();
+	Pieces board[Checkers::Y_SIZE][Checkers::X_SIZE];
+	int redCount();
+	int blackCount();
+	int redKingCount();
+	int blackKingCount();
+	double evaluate();
+	void move(Pieces piece, Move move);
+	void createBoard();
+	void remove(Pieces piece, int row, int column);
+	void remove(int row, int column);
 };
 
 class Game {
   public:
-    Game();
-    void update();
-    Color winner();
-    void reset();
-    bool select(int row, int column);
-    void changeTurn();
-    Board getBoard();
-    void aiMove(Board board);
-
-  private:
-    void init();
-    bool move(int row, int column);
+	void reset();
+	bool isWinner();
+	void update();
+	bool move();
 };
 
-int minimax();
+int minimax(int depth, Player player, Game game);
+Move findBestMove(const Game& game, Player player);
 
 } /* pincergames */
