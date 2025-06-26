@@ -26,7 +26,10 @@ This game is based off of the tictac.py script provided by Arctos.
 
 ### Checkers
 
-This game is under development. Links and information on algorithm sources will be provided.
+The checkers game is under development. It is adapted from the Python checkers game developed by 'Tech With Tim' which is available in the examples folder. That implementation, as well as this one, uses the minimax algorithm. Possible additions include:
+- Alpha-beta pruning
+- Iterative deepening
+- Transposition tables
 
 ### Chess
 

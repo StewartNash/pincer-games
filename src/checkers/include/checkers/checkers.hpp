@@ -5,6 +5,7 @@
 #include <array>
 #include <cstring>
 #include <tuple>
+#include <vector>
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
@@ -59,7 +60,7 @@ class Checkers : public rclcpp::Node {
 		void displayBoard();
 };
 
-enum Color{ NO_COLOR, RED, BLACK };
+enum Color{ NONE, RED, BLACK };
 
 struct Piece {
   int row;
@@ -68,46 +69,45 @@ struct Piece {
   bool isKing;
 };
 
-struct Move {
-
-};
+typedef std::map<std::tuple<int row, int column>, std::vector<Piece>> Moves;
 
 class Board {
   public:
-    Board();
+	Board();
+	//TODO: Choose one representation, either 'board' or '_board'
+	std::vector<Piece> board[Checkers::Y_SIZE];
+	Piece _board[Checkers::Y_SIZE][Checkers::X_SIZE];
+	int redLeft, blackLeft;
+	int redKings, blackKings;
 
-    Piece board[Checkers::Y_SIZE][Checkers::X_SIZE];
-    int redLeft, whiteLeft;
-    int redKings, whiteKings;
-
-    double evaluate();
-    std::vector<Piece> getAllPieces(Color color);
-    void move(Piece piece, int row, int column);
-    Piece getPiece(int row, int column);
-    void createBoard();
-    void remove(std::vector<Piece> pieces);
-    Color winner();
-    std::vector<Move> getValidMoves(Piece piece);
+	double evaluate();
+	std::vector<Piece> getAllPieces(Color color);
+	void move(Piece piece, int row, int column);
+	Piece getPiece(int row, int column);
+	void createBoard();
+	void remove(std::vector<Piece> pieces);
+	Color winner();
+	std::vector<Move> getValidMoves(Piece piece);
 	
   private:
-    std::vector<Move> traverseLeft();
-    std::vector<Move> traverseRight();
+	std::vector<Move> traverseLeft(int start, int stop, int step, Color color, int left, Moves skipped);
+	std::vector<Move> traverseRight(int start, int stop, int step, Color color, int right, Moves skipped);
 };
 
 class Game {
   public:
-    Game();
-    void update();
-    Color winner();
-    void reset();
-    bool select(int row, int column);
-    void changeTurn();
-    Board getBoard();
-    void aiMove(Board board);
+	Game();
+	void update();
+	Color winner();
+	void reset();
+	bool select(int row, int column);
+	void changeTurn();
+	Board getBoard();
+	void aiMove(Board board);
 
   private:
-    void init();
-    bool move(int row, int column);
+	void init();
+	bool move(int row, int column);
 };
 
 int minimax();

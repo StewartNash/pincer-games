@@ -87,3 +87,91 @@ void Checkers::displayBoard() {
 		std::cout << "\nRobot is thinking..." << std::endl;
 	}
 }
+
+Board::Board() {
+	redLeft = 12;
+	blackLeft = 12;
+	redKings = 0;
+	blackKings = 0;
+	createBoard();
+}
+
+
+
+double Board::evaluate() {
+	double output;
+	
+	output = blackLeft - redLeft;
+	output += 0.5 * blackKings - 0.5 * redKings;
+	
+	return output;
+}
+
+std::vector<Piece> Board::getAllPieces(Color color) {
+	std::vector<Piece> pieces;
+	
+	return pieces;
+}
+
+void Board::move(Piece piece, int row, int column) {
+
+}
+
+Piece Board::getPiece(int row, int column) {
+	return _board[row][column];
+}
+
+void Board::createBoard() {
+	for (int row = 0; row < Checkers::Y_SIZE; ++row) {
+		for (int column = 0; column < Checkers::X_SIZE; ++column) {
+			// Only place pieces on dark squares
+			if ((row + column) % 2 == 1) {
+				if (row < 3) {	// Red pieces in top 3 rows
+					board[row].push_back({row, column, Color::RED, false});
+					_board[row][column] = {row, column, Color::RED, false};
+				} else if (row > 4) {  // Black pieces in bottom 3 rows
+					board[row].push_back({row, column, Color::BLACK, false});
+					_board[row][column] = {row, column, Color::BLACK, false};
+				} else {// Middle rows remain empty; no pieces added.
+					_board[row][column] = _board[row][column] = {row, column, Color::NONE, false};
+				}
+			} else {
+				_board[row][column] = _board[row][column] = {row, column, Color::NONE, false};
+			}
+		}
+	}
+}
+
+void Board::remove(std::vector<Piece> pieces) {
+
+}
+
+Color Board::winner() {
+	if (redLeft <= 0) {
+		return Color::BLACK;
+	} else if (blackLeft <= 0) {
+		return Color::RED;
+	} else {
+		return Color::NONE;
+	}
+}
+
+std::vector<Move> Board::getValidMoves(Piece piece) {
+	std::vector<Move> moves;
+	
+	return moves;
+}
+
+std::vector<Move> Board::traverseLeft(int start, int stop, int step, Color color, int left, Moves skipped) {
+	std::vector<Move> moves;
+	
+	return moves;
+}
+
+std::vector<Move> Board::traverseRight(int start, int stop, int step, Color color, int right, Moves skipped) {
+	std::vector<Move> moves;
+	
+	return moves;
+
+}
+
