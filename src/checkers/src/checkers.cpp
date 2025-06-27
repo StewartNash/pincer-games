@@ -5,13 +5,13 @@
 using namespace pincergames;
 
 Checkers::Checkers() : rclcpp::Node("checkers_robot"), count_(0) {
-	std::memset(_boardState, '\0', sizeof(_boardState));
+	std::memset(boardState, '\0', sizeof(boardState));
 	
 	currentTurn = 'R';
 	waitingForHuman = false;
 	gameActive = true;
 	
-	display_board();
+	displayBoard();
 	
 	commandPublisher_ = this->create_publisher<std_msgs::msg::String>("ui_command", 10);
 	boundingBoxesSubscriber_ = this->create_subscription<darknet_emulator_msgs::msg::BoundingBoxes>("bounding_boxes", 1, std::bind(&Checkers::boundingBoxesCallback, this, std::placeholders::_1));
@@ -21,7 +21,7 @@ Checkers::~Checkers() {
 
 }
 
-void Checkers::handleKey_boardInput() {
+void Checkers::handleKeyboardInput() {
 
 }
 
@@ -45,17 +45,17 @@ void Checkers::clearTerminal() {
 
 }
 
-void Checkers::display_board() {
+void Checkers::displayBoard() {
 	char temporary;
 	
-	// Display the current game _board in the terminal
+	// Display the current game board in the terminal
 	clearTerminal();
 	std::cout << "\n╔═══╦═══╦═══╦═══╦═══╦═══╦═══╦═══╗" << std::endl;
 	for (int i = 0; i  < Y_SIZE; i++) {
 		std::cout << "║ ";
 		for (int j = 0; j < X_SIZE; j++) {
 			//temporary = committedMoves[i][j];
-			temporary = _boardState[i][j];
+			temporary = boardState[i][j];
 			if (temporary == '\0') {
 				std::cout << ' ';
 			} else {
@@ -104,7 +104,7 @@ Board::Board() {
 	blackLeft = 12;
 	redKings = 0;
 	blackKings = 0;
-	create_board();
+	createBoard();
 }
 
 
@@ -151,7 +151,7 @@ Piece Board::getPiece(int row, int column) {
 	return board[row][column];
 }
 
-void Board::create_board() {
+void Board::createBoard() {
 	for (int row = 0; row < Checkers::Y_SIZE; ++row) {
 		for (int column = 0; column < Checkers::X_SIZE; ++column) {
 			// Only place pieces on dark squares

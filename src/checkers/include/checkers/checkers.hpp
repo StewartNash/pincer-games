@@ -62,8 +62,6 @@ class Checkers : public rclcpp::Node {
 
 enum Color{ NONE, RED, BLACK };
 
-typedef std::map<std::tuple<int, int>, std::vector<Piece>> Moves;
-
 class Piece {
 	public:
 		Piece() : row(0), column(0), color(Color::NONE), isKing(false) {};
@@ -74,6 +72,8 @@ class Piece {
 		void makeKing();
 		void move(int row_, int column_);
 };
+
+typedef std::map<std::tuple<int, int>, std::vector<Piece>> Moves;
 
 class Board {
 	public:
@@ -94,8 +94,8 @@ class Board {
 		Moves getValidMoves(Piece piece);
 	
 	private:
-		Moves traverseLeft(int start, int stop, int step, Color color, int left, std::vector<Piece> skipped);
-		Moves traverseRight(int start, int stop, int step, Color color, int right, std::vector<Piece> skipped);
+		Moves traverseLeft(int start, int stop, int step, Color color, int left, std::vector<Piece> skipped = std::vector<Piece>());
+		Moves traverseRight(int start, int stop, int step, Color color, int right, std::vector<Piece> skipped = std::vector<Piece>());
 		void copyBoard();
 };
 
