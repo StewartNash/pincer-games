@@ -76,43 +76,43 @@ class Piece {
 };
 
 class Board {
-  public:
-	Board();
-	//TODO: Choose one representation, either 'board' or '_board'
-	std::vector<Piece> _board[Checkers::Y_SIZE];
-	Piece board[Checkers::Y_SIZE][Checkers::X_SIZE];
-	int redLeft, blackLeft;
-	int redKings, blackKings;
+	public:
+		Board();
+		//TODO: Choose one representation, either 'board' or '_board'
+		std::vector<Piece> _board[Checkers::Y_SIZE];
+		Piece board[Checkers::Y_SIZE][Checkers::X_SIZE];
+		int redLeft, blackLeft;
+		int redKings, blackKings;
 
-	double evaluate();
-	std::vector<Piece> getAllPieces(Color color);
-	void move(Piece piece, int row, int column);
-	Piece getPiece(int row, int column);
-	void createBoard();
-	void remove(std::vector<Piece> pieces);
-	Color winner();
-	Moves getValidMoves(Piece piece);
+		double evaluate();
+		std::vector<Piece> getAllPieces(Color color);
+		void move(Piece piece, int row, int column);
+		Piece getPiece(int row, int column);
+		void createBoard();
+		void remove(std::vector<Piece> pieces);
+		Color winner();
+		Moves getValidMoves(Piece piece);
 	
-  private:
-	Moves traverseLeft(int start, int stop, int step, Color color, int left, std::vector<Piece> skipped);
-	Moves traverseRight(int start, int stop, int step, Color color, int right, std::vector<Piece> skipped);
-	void copyBoard();
+	private:
+		Moves traverseLeft(int start, int stop, int step, Color color, int left, std::vector<Piece> skipped);
+		Moves traverseRight(int start, int stop, int step, Color color, int right, std::vector<Piece> skipped);
+		void copyBoard();
 };
 
 class Game {
-  public:
-	Game();
-	void update();
-	Color winner();
-	void reset();
-	bool select(int row, int column);
-	void changeTurn();
-	Board getBoard();
-	void aiMove(Board board);
+	public:
+		Game();
+		void update();
+		Color winner();
+		void reset();
+		bool select(int row, int column);
+		void changeTurn();
+		Board getBoard();
+		void aiMove(Board board);
 
-  private:
-	void init();
-	bool move(int row, int column);
+	private:
+		void init();
+		bool move(int row, int column);
 };
 
 int minimax();
