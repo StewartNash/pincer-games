@@ -270,7 +270,7 @@ Moves Board::traverseLeft(int start, int stop, int step, Color color, int left, 
 	return moves;
 }
 
-Movea Board::traverseRight(int start, int stop, int step, Color color, int right, std::vector<Piece> skipped = std::vector<Piece>()) {
+Moves Board::traverseRight(int start, int stop, int step, Color color, int right, std::vector<Piece> skipped = std::vector<Piece>()) {
 	Moves moves;
 	std::vector<Piece> last;
 	
