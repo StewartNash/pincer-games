@@ -1,15 +1,17 @@
 #include "checkers/checkers.hpp"
 
+#include <algorithm>
+
 using namespace pincergames;
 
 Checkers::Checkers() : rclcpp::Node("checkers_robot"), count_(0) {
-	std::memset(boardState, '\0', sizeof(boardState));
+	std::memset(_boardState, '\0', sizeof(_boardState));
 	
 	currentTurn = 'R';
 	waitingForHuman = false;
 	gameActive = true;
 	
-	displayBoard();
+	display_board();
 	
 	commandPublisher_ = this->create_publisher<std_msgs::msg::String>("ui_command", 10);
 	boundingBoxesSubscriber_ = this->create_subscription<darknet_emulator_msgs::msg::BoundingBoxes>("bounding_boxes", 1, std::bind(&Checkers::boundingBoxesCallback, this, std::placeholders::_1));
@@ -19,7 +21,7 @@ Checkers::~Checkers() {
 
 }
 
-void Checkers::handleKeyboardInput() {
+void Checkers::handleKey_boardInput() {
 
 }
 
@@ -43,17 +45,17 @@ void Checkers::clearTerminal() {
 
 }
 
-void Checkers::displayBoard() {
+void Checkers::display_board() {
 	char temporary;
 	
-	// Display the current game board in the terminal
+	// Display the current game _board in the terminal
 	clearTerminal();
 	std::cout << "\n╔═══╦═══╦═══╦═══╦═══╦═══╦═══╦═══╗" << std::endl;
 	for (int i = 0; i  < Y_SIZE; i++) {
 		std::cout << "║ ";
 		for (int j = 0; j < X_SIZE; j++) {
 			//temporary = committedMoves[i][j];
-			temporary = boardState[i][j];
+			temporary = _boardState[i][j];
 			if (temporary == '\0') {
 				std::cout << ' ';
 			} else {
@@ -88,12 +90,21 @@ void Checkers::displayBoard() {
 	}
 }
 
+void Piece::makeKing() {
+	isKing = true;
+}
+
+void Piece::move(int row_, int column_) {
+	row = row_;
+	column = column_
+}
+
 Board::Board() {
 	redLeft = 12;
 	blackLeft = 12;
 	redKings = 0;
 	blackKings = 0;
-	createBoard();
+	create_board();
 }
 
 
@@ -110,40 +121,67 @@ double Board::evaluate() {
 std::vector<Piece> Board::getAllPieces(Color color) {
 	std::vector<Piece> pieces;
 	
+	for (int row = 0; row < Checkers::Y_SIZE; row++) {
+		for (Piece& piece : _board[row]) {
+			pieces.push_back(piece);
+		}
+	}
+	
 	return pieces;
 }
 
 void Board::move(Piece piece, int row, int column) {
-
+	Piece temporary = board[piece.row][piece.column];
+	board[piece.row][piece.column] = board[row][column];
+	board[row][column] = temporary;
+	piece.move(row, column);
+	
+	if (row == Checkers::Y_SIZE - 1 || row == 0) {
+		piece.makeKing();
+		if (piece.color == Color::BLACK) {
+			blackKings += 1;
+		} else {
+			redKings += 1;
+		}
+	}
+	copyBoard();	
 }
 
 Piece Board::getPiece(int row, int column) {
-	return _board[row][column];
+	return board[row][column];
 }
 
-void Board::createBoard() {
+void Board::create_board() {
 	for (int row = 0; row < Checkers::Y_SIZE; ++row) {
 		for (int column = 0; column < Checkers::X_SIZE; ++column) {
 			// Only place pieces on dark squares
 			if ((row + column) % 2 == 1) {
 				if (row < 3) {	// Red pieces in top 3 rows
-					board[row].push_back({row, column, Color::RED, false});
-					_board[row][column] = {row, column, Color::RED, false};
+					_board[row].push_back({row, column, Color::RED, false});
+					board[row][column] = {row, column, Color::RED, false};
 				} else if (row > 4) {  // Black pieces in bottom 3 rows
-					board[row].push_back({row, column, Color::BLACK, false});
-					_board[row][column] = {row, column, Color::BLACK, false};
+					_board[row].push_back({row, column, Color::BLACK, false});
+					board[row][column] = {row, column, Color::BLACK, false};
 				} else {// Middle rows remain empty; no pieces added.
-					_board[row][column] = _board[row][column] = {row, column, Color::NONE, false};
+					board[row][column] = board[row][column] = {row, column, Color::NONE, false};
 				}
 			} else {
-				_board[row][column] = _board[row][column] = {row, column, Color::NONE, false};
+				board[row][column] = board[row][column] = {row, column, Color::NONE, false};
 			}
 		}
 	}
 }
 
 void Board::remove(std::vector<Piece> pieces) {
-
+	for (Piece& piece : pieces) {
+		board[piece.row][piece.column] = Piece();
+		if (piece.color == Color::RED) {
+			redLeft -= 1;
+		} else if (piece.color == Color::BLACK) {
+			blackLeft -= 1;
+		}
+	}	
+	copyBoard();
 }
 
 Color Board::winner() {
@@ -156,22 +194,137 @@ Color Board::winner() {
 	}
 }
 
-std::vector<Moves> Board::getValidMoves(Piece piece) {
-	std::vector<Moves> moves;
+Moves Board::getValidMoves(Piece piece) {
+	Moves moves;
+	int left, right, row;
+	
+	left = piece.column - 1;
+	right = piece.column + 1;
+	row = piece.row;
+	
+	if (piece.color == Color::RED || piece.isKing) {
+		Moves temporary = traverseLeft(row - 1, std::max(row - 3, -1), -1, piece.color, left);
+		for (const auto& pair : temporary) {
+			temporary[pair.first] = pair.second;
+		}
+		Moves temporary = traverseRight(row - 1, std::max(row - 3, -1), -1, piece.color, right);
+		for (const auto& pair : temporary) {
+			temporary[pair.first] = pair.second;
+		}		
+	}
+	if (piece.color == Color::BLACK || piece.isKing) {
+		Moves temporary = traverseLeft(row + 1, std::min(row + 3, Checkers::Y_SIZE), 1, piece.color, left);
+		for (const auto& pair : temporary) {
+			temporary[pair.first] = pair.second;
+		}
+		Moves temporary = traverseRight(row + 1, std::min(row + 3, Checkers::Y_SIZE), 1, piece.color, right);
+		for (const auto& pair : temporary) {
+			temporary[pair.first] = pair.second;
+		}
+	}
 	
 	return moves;
 }
 
-std::vector<Moves> Board::traverseLeft(int start, int stop, int step, Color color, int left, Moves skipped) {
-	std::vector<Moves> moves;
+Moves Board::traverseLeft(int start, int stop, int step, Color color, int left, std::vector<Piece> skipped = std::vector<Piece>()) {
+	Moves moves;
+	std::vector<Piece> last;
+	
+	for (int r = start; r < stop; r += step) {
+		if (left < 0) {
+			break;
+		}
+		Piece current = board[r][left];
+		if (current.color == Color::NONE) {
+			if (skipped.color != Color::NONE & last.color == Color::NONE) {
+				break;
+			} else if (skipped.color != Color::NONE) {
+				moves[std::make_tuple(r, left)] = last.insert(last.end(), skipped.begin(), skipped.end());
+			} else {
+				moves[std::make_tuple(r, left)] = last;
+			}
+			if (last.color != Color::NONE) {
+				if (step == -1) {
+					row = std::max(r - 3, 0);
+				} else {
+					row = std::min(r + 3, Checkers::Y_SIZE);
+				}
+				Moves temporary = traverseLeft(r + step, row, step, color, left - 1, last);
+				for (const auto& pair : temporary) {
+					temporary[pair.first] = pair.second;
+				}
+				Moves temporary = traverseRight(r + step, row, step, color, left + 1, last);
+				for (const auto& pair : temporary) {
+					temporary[pair.first] = pair.second;
+				}
+			}
+			break;
+		} else if (current.color == color) {
+			break;
+		} else {
+			last.assign(1, current);
+		}		
+		left -= 1;
+	}
 	
 	return moves;
 }
 
-std::vector<Moves> Board::traverseRight(int start, int stop, int step, Color color, int right, Moves skipped) {
-	std::vector<Moves> moves;
+Movea Board::traverseRight(int start, int stop, int step, Color color, int right, std::vector<Piece> skipped = std::vector<Piece>()) {
+	Moves moves;
+	std::vector<Piece> last;
+	
+	for (int r = start; r < stop; r += step) {
+		if (right >= Checkers::X_SIZE) {
+			break;
+		}
+		Piece current = board[r][right];
+		if (current.color == Color::NONE) {
+			if (skipped.color != Color::NONE & last.color == Color::NONE) {
+				break;
+			} else if (skipped.color != Color::NONE) {
+				moves[std::make_tuple(r, right)] = last.insert(last.end(), skipped.begin(), skipped.end());
+			} else {
+				moves[std::make_tuple(r, right)] = last;
+			}
+			if (last.color != Color::NONE) {
+				if (step == -1) {
+					row = std::max(r - 3, 0);
+				} else {
+					row = std::min(r + 3, Checkers::Y_SIZE);
+				}
+				Moves temporary = traverseLeft(r + step, row, step, color, right - 1, last);
+				for (const auto& pair : temporary) {
+					temporary[pair.first] = pair.second;
+				}
+				Moves temporary = traverseRight(r + step, row, step, color, right + 1, last);
+				for (const auto& pair : temporary) {
+					temporary[pair.first] = pair.second;
+				}
+			}
+			break;
+		} else if (current.color == color) {
+			break;
+		} else {
+			last.assign(1, current);
+		}		
+		left -= 1;
+	}
 	
 	return moves;
 
 }
+
+void Board::copyBoard() {
+	for (int i = 0; i < Checkers::Y_SIZE; i++) {
+		std::vector<Piece> temporary;
+		for (int j = 0; j < Checkers::X_SIZE; j++) {
+				if (board[i][j].color != Color::NONE) {
+					temporary.push_back(board[i][j]);
+				}
+		}
+		_board[i] = temporary;
+	}	
+}
+
 

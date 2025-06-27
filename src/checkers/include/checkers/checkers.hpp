@@ -62,21 +62,25 @@ class Checkers : public rclcpp::Node {
 
 enum Color{ NONE, RED, BLACK };
 
-struct Piece {
-  int row;
-  int column;
-  Color color;
-  bool isKing;
-};
-
 typedef std::map<std::tuple<int, int>, std::vector<Piece>> Moves;
+
+class Piece {
+	public:
+		Piece() : row(0), column(0), color(Color::NONE), isKing(false) {};
+		Piece(int row_, int column_, Color color_, bool isKing_) : row(row_), column(column_), color(color_), isKing(isKing_) {};
+		int row, column;
+		Color color;
+		bool isKing;
+		void makeKing();
+		void move(int row_, int column_);
+};
 
 class Board {
   public:
 	Board();
 	//TODO: Choose one representation, either 'board' or '_board'
-	std::vector<Piece> board[Checkers::Y_SIZE];
-	Piece _board[Checkers::Y_SIZE][Checkers::X_SIZE];
+	std::vector<Piece> _board[Checkers::Y_SIZE];
+	Piece board[Checkers::Y_SIZE][Checkers::X_SIZE];
 	int redLeft, blackLeft;
 	int redKings, blackKings;
 
@@ -87,11 +91,12 @@ class Board {
 	void createBoard();
 	void remove(std::vector<Piece> pieces);
 	Color winner();
-	std::vector<Moves> getValidMoves(Piece piece);
+	Moves getValidMoves(Piece piece);
 	
   private:
-	std::vector<Moves> traverseLeft(int start, int stop, int step, Color color, int left, Moves skipped);
-	std::vector<Moves> traverseRight(int start, int stop, int step, Color color, int right, Moves skipped);
+	Moves traverseLeft(int start, int stop, int step, Color color, int left, std::vector<Piece> skipped);
+	Moves traverseRight(int start, int stop, int step, Color color, int right, std::vector<Piece> skipped);
+	void copyBoard();
 };
 
 class Game {
