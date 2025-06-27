@@ -156,20 +156,20 @@ Color Board::winner() {
 	}
 }
 
-std::vector<Move> Board::getValidMoves(Piece piece) {
-	std::vector<Move> moves;
+std::vector<Moves> Board::getValidMoves(Piece piece) {
+	std::vector<Moves> moves;
 	
 	return moves;
 }
 
-std::vector<Move> Board::traverseLeft(int start, int stop, int step, Color color, int left, Moves skipped) {
-	std::vector<Move> moves;
+std::vector<Moves> Board::traverseLeft(int start, int stop, int step, Color color, int left, Moves skipped) {
+	std::vector<Moves> moves;
 	
 	return moves;
 }
 
-std::vector<Move> Board::traverseRight(int start, int stop, int step, Color color, int right, Moves skipped) {
-	std::vector<Move> moves;
+std::vector<Moves> Board::traverseRight(int start, int stop, int step, Color color, int right, Moves skipped) {
+	std::vector<Moves> moves;
 	
 	return moves;
 

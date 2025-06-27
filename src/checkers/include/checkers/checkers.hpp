@@ -69,7 +69,7 @@ struct Piece {
   bool isKing;
 };
 
-typedef std::map<std::tuple<int row, int column>, std::vector<Piece>> Moves;
+typedef std::map<std::tuple<int, int>, std::vector<Piece>> Moves;
 
 class Board {
   public:
@@ -87,11 +87,11 @@ class Board {
 	void createBoard();
 	void remove(std::vector<Piece> pieces);
 	Color winner();
-	std::vector<Move> getValidMoves(Piece piece);
+	std::vector<Moves> getValidMoves(Piece piece);
 	
   private:
-	std::vector<Move> traverseLeft(int start, int stop, int step, Color color, int left, Moves skipped);
-	std::vector<Move> traverseRight(int start, int stop, int step, Color color, int right, Moves skipped);
+	std::vector<Moves> traverseLeft(int start, int stop, int step, Color color, int left, Moves skipped);
+	std::vector<Moves> traverseRight(int start, int stop, int step, Color color, int right, Moves skipped);
 };
 
 class Game {
