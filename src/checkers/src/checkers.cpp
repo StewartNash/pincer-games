@@ -351,7 +351,7 @@ void Game::update() {
 }
 
 Color Game::winner() {
-	return board.winner()
+	return board.winner();
 }
 
 void Game::reset() {
@@ -373,7 +373,7 @@ bool Game::select(int row, int column) {
 	piece = board.getPiece(row, column);
 	if (piece.color == turn) {
 		selected = piece;
-		validMoves = board.getValidMoves();
+		validMoves = board.getValidMoves(piece);
 		
 		return true;
 	}
