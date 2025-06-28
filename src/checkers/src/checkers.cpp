@@ -342,4 +342,83 @@ void Board::copyBoard() {
 	}	
 }
 
+Game::Game() {
+	init();
+}
 
+void Game::update() {
+
+}
+
+Color Game::winner() {
+	return board.winner()
+}
+
+void Game::reset() {
+	init();
+}
+
+bool Game::select(int row, int column) {
+	bool result;
+	Piece piece;
+	
+	if (selected.color != Color::NONE) {
+		result = move(row, column);
+		if (!result) {
+			selected = Piece();
+			select(row, column);
+		}
+	}
+	
+	piece = board.getPiece(row, column);
+	if (piece.color == turn) {
+		selected = piece;
+		validMoves = board.getValidMoves();
+		
+		return true;
+	}
+	
+	return true;
+}
+
+void Game::changeTurn() {
+	validMoves = Moves();
+	if (turn == Color::RED) {
+		turn = Color::BLACK;
+	} else {
+		turn = Color::RED;
+	}
+}
+
+Board Game::getBoard() {
+	return board;
+}
+
+void Game::aiMove(Board board_) {
+	board = board_;
+	changeTurn();
+}
+
+void Game::init() {
+	board = Board();
+	turn = Color::RED;
+}
+
+bool Game::move(int row, int column) {
+	Piece piece;
+	
+	piece = board.getPiece(row, column);
+	auto key = std::make_tuple(row, column);
+	if (selected.color != Color::NONE && piece.color == Color::NONE && validMoves.find(key) != validMoves.end()) {
+		board.move(selected, row, column);
+		std::vector<Piece> skipped = validMoves[key];
+		if (!skipped.empty()) {
+			board.remove(skipped);
+		}
+		changeTurn();
+	} else {
+		return false;
+	}
+	
+	return true;
+}

@@ -108,7 +108,12 @@ class Game {
 		bool select(int row, int column);
 		void changeTurn();
 		Board getBoard();
-		void aiMove(Board board);
+		void aiMove(Board board_);
+		
+		Piece selected;
+		Board board;
+		Color turn;
+		Moves validMoves;
 
 	private:
 		void init();
