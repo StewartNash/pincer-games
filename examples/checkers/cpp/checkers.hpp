@@ -8,6 +8,8 @@
 #include <tuple>
 #include <vector>
 
+#include <iostream>
+
 namespace pincergames {
 
 const std::string ROBOT_WINS = "\
