@@ -89,6 +89,7 @@ class Board {
 		void move(Piece piece, int row, int column);
 		Piece getPiece(int row, int column);
 		void createBoard();
+		void draw();
 		void remove(std::vector<Piece> pieces);
 		Color winner();
 		Moves getValidMoves(Piece piece);
@@ -106,10 +107,11 @@ class Game {
 		Color winner();
 		void reset();
 		bool select(int row, int column);
+		bool select(std::tuple<int, int> position);
 		void changeTurn();
 		Board getBoard();
 		void aiMove(Board board_);
-		
+
 		Piece selected;
 		Board board;
 		Color turn;
@@ -119,7 +121,6 @@ class Game {
 		void init();
 		bool move(int row, int column);
 };
-
 Board minimax(Board position, int depth, Color maxPlayer, Game game);
 Board minimaxBestMove(Board position, int depth, Color maxPlayer, Game game);
 double minimaxMinEval(Board position, int depth, Color maxPlayer, Game game);

@@ -115,6 +115,7 @@ class Game {
 		Color winner();
 		void reset();
 		bool select(int row, int column);
+		bool select(std::tuple<int, int> position);
 		void changeTurn();
 		Board getBoard();
 		void aiMove(Board board_);
