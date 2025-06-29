@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <limits>
 
-using namespace pincergames;
+namespace pincergames {
 
 void Piece::makeKing() {
 	isKing = true;
@@ -516,4 +516,6 @@ std::vector<Board> getAllMoves(Board board, Color color, Game game) {
 	
 	return moves;
 }
+
+} /* namespace pincergames */
 

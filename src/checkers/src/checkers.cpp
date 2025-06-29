@@ -3,7 +3,7 @@
 
 #include "checkers/checkers.hpp"
 
-using namespace pincergames;
+namespace pincergames {
 
 Checkers::Checkers() : rclcpp::Node("checkers_robot"), count_(0) {
 	std::memset(boardState, '\0', sizeof(boardState));
@@ -602,3 +602,5 @@ std::vector<Board> getAllMoves(Board board, Color color, Game game) {
 	
 	return moves;
 }
+
+} /* namespace pincergames */
