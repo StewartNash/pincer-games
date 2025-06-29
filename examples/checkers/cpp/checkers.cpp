@@ -174,6 +174,55 @@ void Board::createBoard() {
 	}
 }
 
+void Board::draw() {
+	Color temporary;
+	
+	// Display the current game board in the terminal
+	//clearTerminal();
+	std::cout << "\n╔═══╦═══╦═══╦═══╦═══╦═══╦═══╦═══╗" << std::endl;
+	for (int i = 0; i  < Checkers::Y_SIZE; i++) {
+		std::cout << "║ ";
+		for (int j = 0; j < Checkers::X_SIZE; j++) {
+			//temporary = committedMoves[i][j];
+			temporary = board[i][j].color;
+			if (temporary == Color::NONE) {
+				std::cout << ' ';
+			} else if (temporary == Color::RED {
+				std::cout << 'R';
+			} else {
+				std::cout << 'B';
+			}
+			std::cout << " ║ ";
+		}
+		//std::cout << " ║";
+		std::cout << std::endl;
+		if (i < Checkers::Y_SIZE - 1) {
+			std::cout << "╠═══╬═══╬═══╬═══╬═══╬═══╬═══╬═══╣" << std::endl;
+		}		
+	}
+	std::cout << "╚═══╩═══╩═══╩═══╩═══╩═══╩═══╩═══╝" << std::endl;
+	
+	/*
+	// Print current state
+	if (!gameActive) {
+		if (checkWinner()) {
+			if (currentTurn == 'X') {
+				std::cout << HUMAN_WINS;
+			} else {
+				std::cout << ROBOT_WINS;
+			}
+		} else {
+			std::cout << TIE_GAME;
+		}
+		std::cout << "\nPress 'r' and Enter to restart" << std::endl;
+	} else if (waitingForHuman) {
+		std::cout << "\nWaiting for human move..." << std::endl;
+	} else {
+		std::cout << "\nRobot is thinking..." << std::endl;
+	}
+	*/
+}
+
 void Board::remove(std::vector<Piece> pieces) {
 	for (Piece& piece : pieces) {
 		board[piece.row][piece.column] = Piece();
@@ -347,7 +396,7 @@ Game::Game() {
 }
 
 void Game::update() {
-
+	board.draw();
 }
 
 Color Game::winner() {

@@ -26,6 +26,14 @@ const std::string TIE_GAME = "\
 It\'s a tie\
 ";
 
+const std::string RED_WINS = "\
+Red wins\
+";
+
+const std::string BLACK_WINS = "\
+Black wins\
+";
+
 class Checkers : public rclcpp::Node {
 	public:
 		static constexpr int BOARD_POSITIONS = 64;
@@ -89,6 +97,7 @@ class Board {
 		void move(Piece piece, int row, int column);
 		Piece getPiece(int row, int column);
 		void createBoard();
+		void draw();
 		void remove(std::vector<Piece> pieces);
 		Color winner();
 		Moves getValidMoves(Piece piece);
@@ -109,7 +118,7 @@ class Game {
 		void changeTurn();
 		Board getBoard();
 		void aiMove(Board board_);
-		
+
 		Piece selected;
 		Board board;
 		Color turn;
