@@ -119,6 +119,8 @@ class Game {
 		void changeTurn();
 		Board getBoard();
 		void aiMove(Board board_);
+		void humanMove(Board board_);
+		void makeMove(Board board_);
 
 		Piece selected;
 		Board board;
@@ -133,7 +135,7 @@ class Game {
 Board minimax(Board position, int depth, Color maxPlayer, Game game);
 Board minimaxBestMove(Board position, int depth, Color maxPlayer, Game game);
 double minimaxMinEval(Board position, int depth, Color maxPlayer, Game game);
-Board simulateMove(Piece piece, Board move, Board board, Game game, std::vector<Piece> skip);
+Board simulateMove(Piece piece, std::tuple<int, int> move, Board board, std::vector<Piece> skip);
 std::vector<Board> getAllMoves(Board board, Color color, Game game);
 //void drawMoves(Game game, Board board, Piece piece);
 

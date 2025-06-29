@@ -75,29 +75,28 @@ class Piece {
 
 typedef std::map<std::tuple<int, int>, std::vector<Piece>> Moves;
 
-class Board {
+class Game {
 	public:
-		Board();
-		//TODO: Choose one representation, either 'board' or '_board'
-		std::vector<Piece> _board[Checkers::Y_SIZE];
-		Piece board[Checkers::Y_SIZE][Checkers::X_SIZE];
-		int redLeft, blackLeft;
-		int redKings, blackKings;
-
-		double evaluate();
-		std::vector<Piece> getAllPieces(Color color);
-		void move(Piece piece, int row, int column);
-		Piece getPiece(int row, int column);
-		void createBoard();
-		void draw();
-		void remove(std::vector<Piece> pieces);
+		Game();
+		void update();
 		Color winner();
-		Moves getValidMoves(Piece piece);
-	
+		void reset();
+		bool select(int row, int column);
+		bool select(std::tuple<int, int> position);
+		void changeTurn();
+		Board getBoard();
+		void aiMove(Board board_);
+		void humanMove(Board board_);
+		void makeMove(Board board_);
+
+		Piece selected;
+		Board board;
+		Color turn;
+		Moves validMoves;
+
 	private:
-		Moves traverseLeft(int start, int stop, int step, Color color, int left, std::vector<Piece> skipped = std::vector<Piece>());
-		Moves traverseRight(int start, int stop, int step, Color color, int right, std::vector<Piece> skipped = std::vector<Piece>());
-		void copyBoard();
+		void init();
+		bool move(int row, int column);
 };
 
 class Game {
@@ -111,6 +110,7 @@ class Game {
 		void changeTurn();
 		Board getBoard();
 		void aiMove(Board board_);
+		void humanMove(Board board_);
 
 		Piece selected;
 		Board board;
@@ -121,10 +121,11 @@ class Game {
 		void init();
 		bool move(int row, int column);
 };
+
 Board minimax(Board position, int depth, Color maxPlayer, Game game);
 Board minimaxBestMove(Board position, int depth, Color maxPlayer, Game game);
 double minimaxMinEval(Board position, int depth, Color maxPlayer, Game game);
-Board simulateMove(Piece piece, Board move, Board board, Game game, std::vector<Piece> skip);
+Board simulateMove(Piece piece, std::tuple<int, int> move, Board board, std::vector<Piece> skip);
 std::vector<Board> getAllMoves(Board board, Color color, Game game);
 //void drawMoves(Game game, Board board, Piece piece);
 

@@ -454,6 +454,14 @@ Board Game::getBoard() {
 }
 
 void Game::aiMove(Board board_) {
+	makeMove(board_);
+}
+
+void Game::humanMove(Board board_) {
+	makeMove(board_);
+}
+
+void Game::makeMove(Board board_) {
 	board = board_;
 	changeTurn();
 }
@@ -565,10 +573,8 @@ double minimaxMinEval(Board position, int depth, Color maxPlayer, Game game) {
 	}
 }
 
-Board simulateMove(Piece piece, std::tuple<int, int> move, Board board, Game game, std::vector<Piece> skip) {
-	int row, column;
-	std::tuple<int, int> position;
-	Piece piece;
+Board simulateMove(Piece piece, std::tuple<int, int> move, Board board, std::vector<Piece> skip) {
+	//int row, column;
 	
 	board.move(piece, std::get<0>(move), std::get<1>(move));
 	if (!skip.empty()) {
@@ -586,11 +592,11 @@ std::vector<Board> getAllMoves(Board board, Color color, Game game) {
 		validMoves = board.getValidMoves(piece);
 		for (const auto& pair : validMoves) {
 			std::tuple<int, int> move = pair.first;
-			Piece skip = pair.second;
+			std::vector<Piece> skip = pair.second;
 			Board tempBoard = board;
 			Piece tempPiece = tempBoard.getPiece(piece.row, piece.column);
 			Board newBoard = simulateMove(tempPiece, move, tempBoard, game, skip);
-			moves.append.(newBoard);		
+			moves.append.(newBoard);	
 		}
 	}
 	

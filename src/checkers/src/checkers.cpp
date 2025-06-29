@@ -454,6 +454,14 @@ Board Game::getBoard() {
 }
 
 void Game::aiMove(Board board_) {
+	makeMove(board_);
+}
+
+void Game::humanMove(Board board_) {
+	makeMove(board_);
+}
+
+void Game::makeMove(Board board_) {
 	board = board_;
 	changeTurn();
 }
@@ -483,26 +491,114 @@ bool Game::move(int row, int column) {
 }
 
 Board minimax(Board position, int depth, Color maxPlayer, Game game) {
-
-	return Board();
+	return minimaxBestMove(position, depth, maxPlayer, game);
 }
 
-Board minimaxBestMove(Board position, int depth, Color maxPlayer, Game game) {
 
-	return Board();
+Board minimaxBestMove(Board position, int depth, Color maxPlayer, Game game) {
+	double maxEval, minEval;
+	double evaluation;
+	Board bestMove;
+	
+	if (depth == 0 || position.winner().color != Color::NONE) {
+		//return position.evaluate();
+		return position;
+	}
+	
+	if (maxPlayer == Color::BLACK) {
+		maxEval = -std::numeric_limits<double>::max();
+		for (auto move : getAllMoves(position, Color::BLACK, game) {
+			evaluation = minimaxMinEval(move, depth - 1, Color::BLACK, game);
+			maxEval = std::max(maxEval, evaluation);
+			if (maxEval == evaluation) {
+				bestMove = move;
+			}
+		}
+		//return maxEval;
+		return bestMove;
+	} else if (maxPlayer == Color::RED) {
+		minEval = std::numeric_limits<double>::max();
+		for (auto move : getAllMoves(position, Color::RED, game) {
+			evaluation = minimaxMinEval(move, depth - 1, true, game);
+			minEval = std::min(minEval, evaluation);
+			if (minEval == evaluation) {
+				bestMove = move;
+			}
+		}
+		//return minEval;
+		return bestMove;
+	} else {
+		std::cout << "ERROR: minimaxBestMove(...), no player selected." << std::endl;
+		//return position.evaluate();
+		return position;
+	}
 }
 
 double minimaxMinEval(Board position, int depth, Color maxPlayer, Game game) {
-
-	return 0;
+	double maxEval, minEval;
+	double evaluation;
+	Board bestMove;
+	
+	if (depth == 0 || position.winner().color != Color::NONE) {
+		return position.evaluate();
+		//return position;
+	}
+	
+	if (maxPlayer == Color::BLACK) {
+		maxEval = -std::numeric_limits<double>::max();
+		for (auto move : getAllMoves(position, Color::BLACK, game) {
+			evaluation = minimaxMinEval(move, depth - 1, Color::BLACK, game);
+			maxEval = std::max(maxEval, evaluation);
+			if (maxEval == evaluation) {
+				bestMove = move;
+			}
+		}
+		return maxEval;
+		//return bestMove;
+	} else if (maxPlayer == Color::RED) {
+		minEval = std::numeric_limits<double>::max();
+		for (auto move : getAllMoves(position, Color::RED, game) {
+			evaluation = minimaxMinEval(move, depth - 1, true, game);
+			minEval = std::min(minEval, evaluation);
+			if (minEval == evaluation) {
+				bestMove = move;
+			}
+		}
+		return minEval;
+		//return bestMove;
+	} else {
+		std::cout << "ERROR: minimaxMinEval(...), no player selected." << std::endl;
+		return position.evaluate();
+		//return position;
+	}
 }
 
-Board simulateMove(Piece piece, Board move, Board board, Game game, std::vector<Piece> skip) {
-
-	return Board();
+Board simulateMove(Piece piece, std::tuple<int, int> move, Board board, std::vector<Piece> skip) {
+	//int row, column;
+	
+	board.move(piece, std::get<0>(move), std::get<1>(move));
+	if (!skip.empty()) {
+		board.remove(skip)
+	}
+	
+	return board;
 }
 
 std::vector<Board> getAllMoves(Board board, Color color, Game game) {
-
-	return std::vector<Board>();
+	std::vector<Board> moves;
+	Moves validMoves;
+	
+	for (Piece piece : board.getAllPieces(color)) {
+		validMoves = board.getValidMoves(piece);
+		for (const auto& pair : validMoves) {
+			std::tuple<int, int> move = pair.first;
+			std::vector<Piece> skip = pair.second;
+			Board tempBoard = board;
+			Piece tempPiece = tempBoard.getPiece(piece.row, piece.column);
+			Board newBoard = simulateMove(tempPiece, move, tempBoard, game, skip);
+			moves.append.(newBoard);	
+		}
+	}
+	
+	return moves;
 }
