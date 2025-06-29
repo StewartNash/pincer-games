@@ -1,7 +1,7 @@
-#include "checkers/checkers.hpp"
-
 #include <algorithm>
 #include <limits>
+
+#include "checkers/checkers.hpp"
 
 using namespace pincergames;
 

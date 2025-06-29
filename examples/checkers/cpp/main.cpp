@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "checkers.hpp"
 
 //std::tuple<int, int> choosePosition(pincergames::Board board, pincergames::Color color);
@@ -12,14 +14,14 @@ int main(int argc, char* argv[]) {
 	game = pincergames::Game();
 	while (run) {
 		if (game.turn == pincergames::Color::BLACK) {
-			Board newBoard = pincergames::minimax(game.getBoard(), 4, pincergames::Color::BLACK, game);
+			pincergames::Board newBoard = pincergames::minimax(game.getBoard(), 4, pincergames::Color::BLACK, game);
 			game.aiMove(newBoard);
 		
 		} else if (game.turn == pincergames::Color::RED) {
 			//position = choosePosition(game.getBoard(), pincergames::Color::RED);
 			//game.select(position);
 			//game.select(chooseMove(game.getBoard(), position));		
-			Board newBoard = pincergames::minimax(game.getBoard(), 4, pincergames::Color::RED, game);
+			pincergames::Board newBoard = pincergames::minimax(game.getBoard(), 4, pincergames::Color::RED, game);
 			game.humanMove(newBoard);
 		}
 		
