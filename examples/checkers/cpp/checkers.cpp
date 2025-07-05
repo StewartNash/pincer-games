@@ -74,16 +74,16 @@ void Board::createBoard() {
 			// Only place pieces on dark squares
 			if ((row + column) % 2 == 1) {
 				if (row < 3) {	// Red pieces in top 3 rows
-					_board[row].push_back({row, column, Color::RED, false});
-					board[row][column] = {row, column, Color::RED, false};
-				} else if (row > 4) {  // Black pieces in bottom 3 rows
 					_board[row].push_back({row, column, Color::BLACK, false});
 					board[row][column] = {row, column, Color::BLACK, false};
+				} else if (row > 4) {  // Black pieces in bottom 3 rows
+					_board[row].push_back({row, column, Color::RED, false});
+					board[row][column] = {row, column, Color::RED, false};
 				} else {// Middle rows remain empty; no pieces added.
-					board[row][column] = board[row][column] = {row, column, Color::NONE, false};
+					board[row][column] = {row, column, Color::NONE, false};
 				}
 			} else {
-				board[row][column] = board[row][column] = {row, column, Color::NONE, false};
+				board[row][column] = {row, column, Color::NONE, false};
 			}
 		}
 	}
@@ -172,21 +172,21 @@ Moves Board::getValidMoves(Piece piece) {
 	if (piece.color == Color::RED || piece.isKing) {
 		temporary = traverseLeft(row - 1, std::max(row - 3, -1), -1, piece.color, left);
 		for (const auto& pair : temporary) {
-			temporary[pair.first] = pair.second;
+			moves[pair.first] = pair.second;
 		}
 		temporary = traverseRight(row - 1, std::max(row - 3, -1), -1, piece.color, right);
 		for (const auto& pair : temporary) {
-			temporary[pair.first] = pair.second;
+			moves[pair.first] = pair.second;
 		}		
 	}
 	if (piece.color == Color::BLACK || piece.isKing) {
 		temporary = traverseLeft(row + 1, std::min(row + 3, Checkers::Y_SIZE), 1, piece.color, left);
 		for (const auto& pair : temporary) {
-			temporary[pair.first] = pair.second;
+			moves[pair.first] = pair.second;
 		}
 		temporary = traverseRight(row + 1, std::min(row + 3, Checkers::Y_SIZE), 1, piece.color, right);
 		for (const auto& pair : temporary) {
-			temporary[pair.first] = pair.second;
+			moves[pair.first] = pair.second;
 		}
 	}
 	
@@ -198,7 +198,7 @@ Moves Board::traverseLeft(int start, int stop, int step, Color color, int left, 
 	std::vector<Piece> last;
 	Moves temporary;
 	
-	for (int r = start; r < stop; r += step) {
+	for (int r = start; (step > 0) ? (r < stop) : (r > stop); r += step) {
 		if (left < 0) {
 			break;
 		}
@@ -224,11 +224,11 @@ Moves Board::traverseLeft(int start, int stop, int step, Color color, int left, 
 				}
 				temporary = traverseLeft(r + step, row, step, color, left - 1, last);
 				for (const auto& pair : temporary) {
-					temporary[pair.first] = pair.second;
+					moves[pair.first] = pair.second;
 				}
 				temporary = traverseRight(r + step, row, step, color, left + 1, last);
 				for (const auto& pair : temporary) {
-					temporary[pair.first] = pair.second;
+					moves[pair.first] = pair.second;
 				}
 			}
 			break;
@@ -248,7 +248,7 @@ Moves Board::traverseRight(int start, int stop, int step, Color color, int right
 	std::vector<Piece> last;
 	Moves temporary;
 	
-	for (int r = start; r < stop; r += step) {
+	for (int r = start; (step > 0) ? (r < stop) : (r > stop); r += step) {
 		if (right >= Checkers::X_SIZE) {
 			break;
 		}
@@ -274,11 +274,11 @@ Moves Board::traverseRight(int start, int stop, int step, Color color, int right
 				}
 				temporary = traverseLeft(r + step, row, step, color, right - 1, last);
 				for (const auto& pair : temporary) {
-					temporary[pair.first] = pair.second;
+					moves[pair.first] = pair.second;
 				}
 				temporary = traverseRight(r + step, row, step, color, right + 1, last);
 				for (const auto& pair : temporary) {
-					temporary[pair.first] = pair.second;
+					moves[pair.first] = pair.second;
 				}
 			}
 			break;

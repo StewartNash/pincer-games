@@ -17,13 +17,16 @@ int main(int argc, char* argv[]) {
 	while (run) {
 		if (game.turn == pincergames::Color::BLACK) {
 			pincergames::Board newBoard = pincergames::minimax(game.getBoard(), 4, pincergames::Color::BLACK, game);
+			//newBoard.draw(); //DEBUG LINE
 			game.aiMove(newBoard);
 		
 		} else if (game.turn == pincergames::Color::RED) {
 			//position = choosePosition(game.getBoard(), pincergames::Color::RED);
 			//game.select(position);
-			//game.select(chooseMove(game.getBoard(), position));		
+			//game.select(chooseMove(game.getBoard(), position));
+			
 			pincergames::Board newBoard = pincergames::minimax(game.getBoard(), 4, pincergames::Color::RED, game);
+			//newBoard.draw(); //DEBUG LINE
 			game.humanMove(newBoard);
 		}
 		
